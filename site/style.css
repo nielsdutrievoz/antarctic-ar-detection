@@ -14,6 +14,7 @@
   --ar: #00b8d4;            /* cyan, comme les contours AR des cartes */
   --ar-soft: #d9f7fc;
   --ar-ink: #00586a;
+  --ar-iwv: #64dd17;        /* vert, comme les contours IWV des cartes */
 }
 * { box-sizing: border-box; }
 body {
@@ -166,3 +167,20 @@ figure { margin: 0; }
 .prose li { margin-bottom: 6px; }
 .prose li::marker { color: var(--accent); }
 .refs ol li { font-size: .92rem; }
+
+/* frise : une ligne par méthode de détection */
+.strip-row { display: flex; align-items: center; gap: 6px; margin-top: 3px; }
+.strip-row .strip { flex: 1; }
+.strip-label { font-family: var(--head); font-size: .62rem; letter-spacing: .04em; width: 30px; color: var(--muted); }
+.strip button.ar-iwv { background: var(--ar-iwv); }
+.axis { padding-left: 36px; }
+
+/* description de l'événement, au-dessus de la carte */
+.event-about { margin: 4px 0 16px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.event-about[hidden] { display: none; }
+.event-about h2 { margin: 0 0 8px; }
+.event-about p { margin: 0 0 8px; }
+.event-about p:last-child { margin-bottom: 0; }
+
+/* un élément masqué reste masqué même si une règle lui donne un display */
+[hidden] { display: none !important; }

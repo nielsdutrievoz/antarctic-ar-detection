@@ -17,11 +17,15 @@ TEXT = {
     "fr": dict(title="IVT, pression au niveau de la mer et rivières atmosphériques",
                ar="Contour cyan : rivière atmosphérique",
                algo="Détection AR : Wille et al. (2021), JGR Atmospheres, doi:10.1029/2020JD033788 · vIVT > 98e percentile mensuel ERA5, ≥ 20° de latitude",
+               algo2="Détection AR : cyan = vIVT, Wille et al. (2021), doi:10.1029/2020JD033788 · vert = IWV, Wille et al. (2019), doi:10.1038/s41561-019-0460-1 · > 98e percentile mensuel ERA5, ≥ 20° lat.",
+               ar2="Contours : cyan = AR (vIVT), vert = AR (IWV)",
                no_ar="Seuils ERA5 non disponibles : pas de détection d'AR",
                isobars="Isobares 4 hPa, masquées si p$_s$ < 800 hPa · pointillés : limite de détection 85°S"),
     "en": dict(title="IVT, mean sea-level pressure and atmospheric rivers",
                ar="Cyan contour: atmospheric river",
                algo="AR detection: Wille et al. (2021), JGR Atmospheres, doi:10.1029/2020JD033788 · vIVT > monthly ERA5 98th percentile, ≥ 20° latitude",
+               algo2="AR detection: cyan = vIVT, Wille et al. (2021), doi:10.1029/2020JD033788 · green = IWV, Wille et al. (2019), doi:10.1038/s41561-019-0460-1 · > monthly ERA5 98th pct, ≥ 20° lat.",
+               ar2="Contours: cyan = AR (vIVT), green = AR (IWV)",
                no_ar="ERA5 thresholds not available: no AR detection",
                isobars="Isobars every 4 hPa, masked where p$_s$ < 800 hPa · dashed: 85°S detection limit"),
 }
@@ -101,20 +105,23 @@ def render(job: dict) -> list[str]:
         ax.quiver(lon2[show], lat2[show], d["uivt"][sl][show], d["vivt"][sl][show], transform=pc,
                   scale=12000, width=0.0018, color="#202020", alpha=0.75)
 
+    def ar_contour(mask, color, z):
+        """Contour fermé d'un masque AR, couleur vive cerclée de noir."""
+        m = mask.astype(float)
+        ml = d["ar_lat"]
+        dl = ml[1] - ml[0]
+        m = np.vstack([np.zeros((1, m.shape[1])), m, np.zeros((1, m.shape[1]))])
+        ml = np.concatenate([[ml[0] - dl], ml, [ml[-1] + dl]])
+        mc, lc = add_cyclic_point(m, coord=d["ar_lon"])
+        XM, YM = np.meshgrid(lc, ml)
+        cs_m = ax.contour(XM, YM, mc, levels=[0.5], colors=color, linewidths=2.4, transform=pc, zorder=z)
+        cs_m.set(path_effects=[patheffects.withStroke(linewidth=4.8, foreground="#0f1e2e")])
+
+    has_iwv = "ar_iwv" in d.files
+    if has_iwv and d["ar_iwv"].any():
+        ar_contour(d["ar_iwv"], "#76ff03", 8)      # IWV en dessous, vert
     if "ar" in d.files and d["ar"].any():
-        # Le masque s'arrête aux bords du domaine de détection (37.5°S et 85°S) : on l'entoure
-        # d'une rangée de zéros pour que le contour se referme au lieu de s'interrompre au bord.
-        ar = d["ar"].astype(float)
-        ar_lat = d["ar_lat"]
-        dl = ar_lat[1] - ar_lat[0]
-        ar = np.vstack([np.zeros((1, ar.shape[1])), ar, np.zeros((1, ar.shape[1]))])
-        ar_lat = np.concatenate([[ar_lat[0] - dl], ar_lat, [ar_lat[-1] + dl]])
-        ar_c, lon_ar = add_cyclic_point(ar, coord=d["ar_lon"])
-        XA, YA = np.meshgrid(lon_ar, ar_lat)
-        # cyan vif cerclé de noir : se détache sur toute la palette jaune-orange-violet de l'IVT
-        cs_ar = ax.contour(XA, YA, ar_c, levels=[0.5], colors="#00e5ff", linewidths=2.4,
-                           transform=pc, zorder=8)
-        cs_ar.set(path_effects=[patheffects.withStroke(linewidth=4.8, foreground="#0f1e2e")])
+        ar_contour(d["ar"], "#00e5ff", 9)          # vIVT au-dessus, cyan
     if job.get("has_thr"):
         # limite sud de la détection (85°S) : les AR y sont coupés
         ring = np.linspace(0, 360, 361)
@@ -145,8 +152,9 @@ def render(job: dict) -> list[str]:
         tx = TEXT[lang]
         t_title.set_text(tx["title"])
         t_sub.set_text(job["subtitles"][lang])
-        t_algo.set_text(tx["algo"] if job["has_thr"] else tx["no_ar"])
-        t_note.set_text(" · ".join(([tx["ar"]] if job["has_thr"] else []) + [tx["isobars"], job["credit"]]))
+        t_algo.set_text((tx["algo2"] if has_iwv else tx["algo"]) if job["has_thr"] else tx["no_ar"])
+        ar_txt = tx["ar2"] if has_iwv else tx["ar"]
+        t_note.set_text(" · ".join(([ar_txt] if job["has_thr"] else []) + [tx["isobars"], job["credit"]]))
         buf = io.BytesIO()
         fig.savefig(buf, dpi=dpi, format="png")
         buf.seek(0)

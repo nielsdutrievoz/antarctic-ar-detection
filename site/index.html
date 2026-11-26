@@ -41,6 +41,11 @@
     <section class="panel viewer" aria-label="Cartes">
       <p class="small muted info" id="info"></p>
       <div id="event-picker" class="event-picker" hidden></div>
+      <div class="event-about" id="event-about" hidden>
+        <h2 id="event-title"></h2>
+        <p id="event-desc"></p>
+        <p class="small muted" id="event-ref"></p>
+      </div>
       <div class="controls">
         <button id="prev" class="ctrl" aria-label="‹">‹</button>
         <button id="play" class="ctrl" aria-label="▶">▶</button>
@@ -58,12 +63,6 @@
     </section>
 
     <aside class="side">
-      <section class="panel" id="event-about" hidden>
-        <p class="eyebrow" data-i18n="event_label">Événement</p>
-        <h2 id="event-title"></h2>
-        <p id="event-desc"></p>
-        <p class="small muted" id="event-ref"></p>
-      </section>
       <section class="panel">
         <p class="eyebrow" data-i18n="sites_label">Stations</p>
         <h2 data-i18n="sites_title">AR aux sites</h2>
@@ -117,7 +116,8 @@
         <li>La détection s'arrête à 85°S, et le critère de 20° de latitude favorise les AR qui s'étendent depuis l'océan : un AR très avancé sur le plateau peut être manqué.</li>
         <li>Les prévisions au-delà de 3 à 4 jours sont incertaines ; ce produit est expérimental.</li>
       </ul>
-      <p>Il existe aussi une variante fondée sur la colonne d'eau totale (IWV, Wille et al. 2019), plus adaptée à l'étude de la fonte de surface ; elle n'est pas utilisée ici.</p>
+      <h3>Deuxième méthode : vapeur d'eau totale (IWV)</h3>
+      <p>Les cartes montrent aussi, en <b>vert</b>, la variante de Wille et al. (2019) : le critère porte sur la colonne d'eau précipitable totale (IWV) au lieu du transport vers le pôle. Le seuil (98<sup>e</sup> percentile mensuel local, ERA5 1991–2020) et le critère de forme (≥ 20° de latitude, 37,5–85°S) sont les mêmes. Comme l'IWV ne dépend pas du sens du vent, cette méthode suit l'humidité d'un AR même quand elle circule vers le nord, par exemple après avoir traversé le plateau. C'est le cas de l'événement de décembre 2018, où le transport à Concordia était dirigé vers l'océan. La méthode vIVT (cyan) reste la plus sélective pour les intrusions venant de l'océan.</p>
 
       <h3>Catalogue et code</h3>
       <ul>
@@ -158,7 +158,8 @@
         <li>Detection stops at 85°S, and the 20°-latitude criterion favours ARs extending from the ocean: an AR far onto the plateau may be missed.</li>
         <li>Forecasts beyond 3–4 days are uncertain; this is an experimental product.</li>
       </ul>
-      <p>A variant based on total column water vapour (IWV, Wille et al. 2019), better suited to surface melt studies, also exists; it is not used here.</p>
+      <h3>Second method: total water vapour (IWV)</h3>
+      <p>The maps also show, in <b>green</b>, the Wille et al. (2019) variant: the criterion uses total precipitable water (IWV) instead of poleward transport. The threshold (local monthly 98th percentile, ERA5 1991–2020) and shape criterion (≥ 20° of latitude, 37.5–85°S) are the same. Because IWV does not depend on wind direction, this method follows the moisture of an AR even when it moves northward, for instance after crossing the plateau. This is the case for the December 2018 event, when transport at Concordia was directed towards the ocean. The vIVT method (cyan) remains the most selective for intrusions from the ocean.</p>
 
       <h3>Catalogue and code</h3>
       <ul>

@@ -31,6 +31,7 @@ VARS = {
     "vivt": "vertical_integral_of_northward_water_vapour_flux",
     "msl": "mean_sea_level_pressure",
     "sp": "surface_pressure",
+    "iwv": "total_column_water_vapour",
 }
 
 
@@ -38,8 +39,12 @@ def download(cfg: dict, ev: dict) -> Path:
     import cdsapi
 
     out = arcore.cfg_path(cfg, "data/events") / f"era5_{ev['id']}.nc"
+    missing = dict(VARS)
     if out.exists():
-        return out
+        have = set(_open(out).data_vars)
+        missing = {k: v for k, v in VARS.items() if k not in have}
+        if not missing:
+            return out
     out.parent.mkdir(parents=True, exist_ok=True)
     days = [ev["start"] + dt.timedelta(days=i) for i in range((ev["end"] - ev["start"]).days + 1)]
     res = float(cfg["detection"]["grid_res"])
@@ -53,7 +58,7 @@ def download(cfg: dict, ev: dict) -> Path:
             "reanalysis-era5-single-levels",
             {
                 "product_type": ["reanalysis"],
-                "variable": list(VARS.values()),
+                "variable": list(missing.values()),
                 "year": [str(ym[0])],
                 "month": [f"{ym[1]:02d}"],
                 "day": [f"{d.day:02d}" for d in days if (d.year, d.month) == ym],
@@ -67,7 +72,11 @@ def download(cfg: dict, ev: dict) -> Path:
         )
         parts.append(part)
     ds = xr.concat([_open(p) for p in parts], dim="time").sortby("time")
-    ds.to_netcdf(out)
+    if out.exists():                      # ajoute les variables manquantes au fichier existant
+        ds = xr.merge([_open(out), ds])
+    tmp_out = out.with_suffix(".tmp.nc")
+    ds.to_netcdf(tmp_out)
+    tmp_out.replace(out)
     for p in parts:
         p.unlink()
     return out
@@ -80,12 +89,13 @@ def _open(path: Path) -> xr.Dataset:
     drop = [c for c in ("number", "expver") if c in ds.coords]
     ds = ds.drop_vars(drop)
     # noms courts ERA5 -> noms internes
-    short = {"viwve": "uivt", "viwvn": "vivt", "msl": "msl", "sp": "sp"}
+    short = {"viwve": "uivt", "viwvn": "vivt", "msl": "msl", "sp": "sp", "tcwv": "iwv"}
     ds = ds.rename({k: v for k, v in short.items() if k in ds and k != v})
     return ds.sortby("latitude", ascending=False)
 
 
-def build(cfg: dict, ev: dict, thresholds: xr.Dataset, out_root: Path, workers: int) -> dict:
+def build(cfg: dict, ev: dict, thresholds: xr.Dataset, out_root: Path, workers: int,
+          thr_iwv: xr.Dataset | None = None) -> dict:
     det = cfg["detection"]
     ds = _open(download(cfg, ev))
     lat, lon = ds["latitude"].values, np.mod(ds["longitude"].values, 360.0)
@@ -108,8 +118,14 @@ def build(cfg: dict, ev: dict, thresholds: xr.Dataset, out_root: Path, workers: 
         thr = thresholds["threshold"].sel(month=t.month).values
         ar = arcore.detect_ar(pol, thr, dlat, det["min_lat_extent"])
         ar_sites = [n for n, m in site_masks.items() if ar[m].any()]
+        extra, ar_sites_iwv = {}, None
+        if thr_iwv is not None:
+            ar_iwv = arcore.detect_ar(f["iwv"][ilat][:, ilon], thr_iwv["threshold"].sel(month=t.month).values,
+                                      dlat, det["min_lat_extent"])
+            extra["ar_iwv"] = ar_iwv
+            ar_sites_iwv = [n for n, m in site_masks.items() if ar_iwv[m].any()]
         npz = tmp / f"ev_{ev['id']}_{i:03d}.npz"
-        np.savez(npz, lat=lat, lon=lon, **f, ar=ar, ar_lat=dlat, ar_lon=dlon)
+        np.savez(npz, lat=lat, lon=lon, **f, ar=ar, ar_lat=dlat, ar_lon=dlon, **extra)
         fname = f"{t:%Y%m%d_%H}.png"
         jobs.append(dict(
             npz=str(npz), dpi=int(cfg["site"].get("dpi", 110)),
@@ -119,8 +135,12 @@ def build(cfg: dict, ev: dict, thresholds: xr.Dataset, out_root: Path, workers: 
             lat_north=float(cfg["site"]["plot_lat_north"]),
             quiver_every=int(cfg["site"].get("quiver_every", 8)),
             sites=cfg["sites"], has_thr=True))
-        frames.append(dict(time=t.strftime("%Y-%m-%dT%H:%MZ"), file=fname, ar_sites=ar_sites))
-        print(f"  {t:%Y-%m-%d %HZ}" + (f"  AR : {', '.join(ar_sites)}" if ar_sites else ""), flush=True)
+        fr = dict(time=t.strftime("%Y-%m-%dT%H:%MZ"), file=fname, ar_sites=ar_sites)
+        if ar_sites_iwv is not None:
+            fr["ar_sites_iwv"] = ar_sites_iwv
+        frames.append(fr)
+        print(f"  {t:%Y-%m-%d %HZ}" + (f"  vIVT : {', '.join(ar_sites)}" if ar_sites else "")
+              + (f"  IWV : {', '.join(ar_sites_iwv)}" if ar_sites_iwv else ""), flush=True)
 
     with ProcessPoolExecutor(max_workers=workers) as pool:
         list(pool.map(maprender.render, jobs))
@@ -155,6 +175,9 @@ def main(argv=None):
     if not thr_file.exists():
         sys.exit(f"Seuils absents ({thr_file}). Lancer d'abord build_climatology.py.")
     thresholds = xr.load_dataset(thr_file)
+    thr_iwv_file = arcore.cfg_path(cfg, cfg["climatology"].get("output_iwv", "data/thresholds_iwv.nc"))
+    thr_iwv = xr.load_dataset(thr_iwv_file) if thr_iwv_file.exists() else None
+    print("Détection IWV :", "oui" if thr_iwv is not None else f"non ({thr_iwv_file.name} absent)")
 
     out_root = arcore.cfg_path(cfg, cfg["site"]["output_dir"]) / "events"
     out_root.mkdir(parents=True, exist_ok=True)
@@ -162,7 +185,7 @@ def main(argv=None):
     old = {e["id"]: e for e in json.loads(manifest_file.read_text())} if manifest_file.exists() else {}
     for ev in events:
         print(f"Événement {ev['id']} ({ev['start']} → {ev['end']})", flush=True)
-        old[ev["id"]] = build(cfg, ev, thresholds, out_root, int(cfg["site"].get("render_workers", 4)))
+        old[ev["id"]] = build(cfg, ev, thresholds, out_root, int(cfg["site"].get("render_workers", 4)), thr_iwv)
     order = [e["id"] for e in cfg["events"]]
     manifest = [old[i] for i in order if i in old]
     manifest_file.write_text(json.dumps(manifest, indent=1, ensure_ascii=False))

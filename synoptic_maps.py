@@ -26,7 +26,7 @@ import maprender
 import opendata
 
 PARAMS_PL = ("q", "u", "v")
-PARAMS_SFC = ("sp", "msl")
+PARAMS_SFC = ("sp", "msl", "tcwv")
 
 
 # --------------------------------------------------------------------------- données
@@ -59,7 +59,7 @@ def load_step(cfg, base, step, lat, lon, levels):
     sp = f[("sp", 0)]
     return dict(uivt=arcore.vivt_from_levels(q, u, sp, levels),
                 vivt=arcore.vivt_from_levels(q, v, sp, levels),
-                msl=f[("msl", 0)] / 100.0, sp=sp)
+                msl=f[("msl", 0)] / 100.0, sp=sp, iwv=f[("tcwv", 0)])
 
 
 # --------------------------------------------------------------------------- main
@@ -100,6 +100,8 @@ def main(argv=None):
             thresholds = None
     else:
         print(f"Seuils absents ({thr_file}) : cartes sans détection d'AR.")
+    thr_iwv_file = arcore.cfg_path(cfg, cfg["climatology"].get("output_iwv", "data/thresholds_iwv.nc"))
+    thr_iwv = xr.load_dataset(thr_iwv_file) if (thresholds is not None and thr_iwv_file.exists()) else None
     levels = [int(x) for x in cfg["forecast"]["levels"]]
     site_masks = {s["name"]: arcore.site_mask(s, dlat, dlon) for s in cfg["sites"]}
 
@@ -117,6 +119,12 @@ def main(argv=None):
                 ar = arcore.detect_ar(pol, thr, dlat, det["min_lat_extent"])
                 extra = dict(ar=ar, ar_lat=dlat, ar_lon=dlon)
                 ar_sites = [n for n, m in site_masks.items() if ar[m].any()]
+            ar_sites_iwv = None
+            if thr_iwv is not None:
+                ar_iwv = arcore.detect_ar(fl["iwv"][ilat], thr_iwv["threshold"].sel(month=vt.month).values,
+                                          dlat, det["min_lat_extent"])
+                extra["ar_iwv"] = ar_iwv
+                ar_sites_iwv = [n for n, m in site_masks.items() if ar_iwv[m].any()]
             npz = tmp / f"frame_{step:03d}.npz"
             np.savez(npz, lat=lat, lon=lon, **fl, **extra)
             fname = f"syn_{step:03d}.png"
@@ -129,8 +137,10 @@ def main(argv=None):
                        lat_north=float(sc["plot_lat_north"]), quiver_every=int(sc.get("quiver_every", 8)),
                        sites=cfg["sites"], has_thr=thresholds is not None)
             futures.append(pool.submit(maprender.render, job))
-            frames.append(dict(step=step, valid=vt.strftime("%Y-%m-%dT%H:%MZ"), file=fname,
-                               ar_sites=ar_sites))
+            frame = dict(step=step, valid=vt.strftime("%Y-%m-%dT%H:%MZ"), file=fname, ar_sites=ar_sites)
+            if ar_sites_iwv is not None:
+                frame["ar_sites_iwv"] = ar_sites_iwv
+            frames.append(frame)
             print(f"  +{step:3d}h {vt:%d/%m %HZ} ({time.time() - t0:4.1f}s)"
                   + (f"  AR : {', '.join(ar_sites)}" if ar_sites else ""), flush=True)
         for f in futures:
@@ -150,6 +160,7 @@ def main(argv=None):
         model="ECMWF IFS HRES 0.25° (open data)",
         period=f"{cfg['climatology']['first_year']}-{cfg['climatology']['last_year']}",
         detection=thresholds is not None,
+        detection_iwv=thr_iwv is not None,
         sites=[dict(name=s["name"], lat=s["lat"], lon=s["lon"]) for s in cfg["sites"]],
         frames=frames,
         gif=gifs,

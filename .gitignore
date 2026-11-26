@@ -1,6 +1,7 @@
 # données générées (seul le fichier de seuils est versionné)
 data/*
 !data/thresholds_vivt.nc
+!data/thresholds_iwv.nc
 site/maps/
 site/data/
 __pycache__/

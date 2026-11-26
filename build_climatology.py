@@ -119,8 +119,13 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--config", default=str(Path(__file__).with_name("config.yaml")))
     ap.add_argument("--skip-download", action="store_true", help="utiliser les fichiers déjà téléchargés")
+    ap.add_argument("--variable", choices=["vivt", "iwv"],
+                    help="remplace detection.variable ; les seuils vont dans data/thresholds_<variable>.nc")
     args = ap.parse_args(argv)
     cfg = arcore.load_config(args.config)
+    if args.variable:
+        cfg["detection"]["variable"] = args.variable
+        cfg["climatology"]["output"] = f"data/thresholds_{args.variable}.nc"
     if args.skip_download:
         clim = cfg["climatology"]
         d = arcore.cfg_path(cfg, clim["download_dir"])

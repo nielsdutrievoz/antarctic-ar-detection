@@ -21,11 +21,11 @@ const I18N = {
     download_image: "Télécharger l'image",
     download_gif: "Télécharger l'animation (GIF)",
     sites_title: "AR aux sites",
-    sites_help: "Case colorée : un AR est détecté à moins de 100 km du site. Clique sur une case pour afficher la carte.",
+    sites_help: "Case colorée : un AR est détecté à moins de 100 km du site (cyan : vIVT, vert : IWV). Clique sur une case pour afficher la carte.",
     legend_title: "Lecture des cartes",
     legend_ivt: "<b>Couleurs</b> : transport intégré de vapeur d'eau (IVT), kg m<sup>-1</sup> s<sup>-1</sup>. Flèches là où IVT ≥ 250.",
     legend_msl: "<b>Traits noirs</b> : pression au niveau de la mer, tous les 4 hPa (masquée sur le haut plateau).",
-    legend_ar: "<b>Contour cyan</b> : rivière atmosphérique détectée. Le cercle pointillé marque la limite sud de la détection (85°S) : un AR qui la dépasse y est coupé.",
+    legend_ar: "<b>Contour cyan</b> : AR détecté par le transport de vapeur vers le pôle (vIVT, Wille et al. 2021). <b>Contour vert</b> : AR détecté par la vapeur d'eau totale (IWV, Wille et al. 2019), quel que soit le sens du transport. Le cercle pointillé marque la limite sud de la détection (85°S).",
     method_title: "Méthode",
     method_text: "Prévisions : ECMWF IFS déterministe (HRES, 0.25°), données ouvertes ECMWF (CC-BY-4.0). Événements passés : réanalyse ERA5 (Copernicus). Détection d'après Wille et al. (2021, <i>JGR Atmospheres</i>) : vIVT poléward supérieur au 98<sup>e</sup> percentile mensuel local, objets s'étendant sur au moins 20° de latitude entre 37.5°S et 85°S. Produit expérimental, sans garantie.",
     detection_on: (p) => `Seuils : 98e percentile mensuel du vIVT ERA5 ${p}.`,
@@ -60,11 +60,11 @@ const I18N = {
     download_image: "Download image",
     download_gif: "Download animation (GIF)",
     sites_title: "ARs at sites",
-    sites_help: "Coloured cell: an AR is detected within 100 km of the site. Click a cell to show that map.",
+    sites_help: "Coloured cell: an AR is detected within 100 km of the site (cyan: vIVT, green: IWV). Click a cell to show that map.",
     legend_title: "Reading the maps",
     legend_ivt: "<b>Colours</b>: integrated water vapour transport (IVT), kg m<sup>-1</sup> s<sup>-1</sup>. Arrows where IVT ≥ 250.",
     legend_msl: "<b>Black lines</b>: mean sea-level pressure every 4 hPa (masked over the high plateau).",
-    legend_ar: "<b>Cyan contour</b>: detected atmospheric river. The dashed circle marks the southern detection limit (85°S): an AR extending beyond it is cut there.",
+    legend_ar: "<b>Cyan contour</b>: AR detected from poleward vapour transport (vIVT, Wille et al. 2021). <b>Green contour</b>: AR detected from total water vapour (IWV, Wille et al. 2019), whatever the transport direction. The dashed circle marks the southern detection limit (85°S).",
     method_title: "Method",
     method_text: "Forecasts: ECMWF IFS deterministic (HRES, 0.25°), ECMWF open data (CC-BY-4.0). Past events: ERA5 reanalysis (Copernicus). Detection after Wille et al. (2021, <i>JGR Atmospheres</i>): poleward vIVT above the local monthly 98<sup>th</sup> percentile, objects spanning at least 20° of latitude between 37.5°S and 85°S. Experimental product, no warranty.",
     detection_on: (p) => `Thresholds: monthly 98th percentile of ERA5 vIVT ${p}.`,
@@ -260,7 +260,9 @@ function buildSites() {
   box.innerHTML = "";
   const frames = view.frames;
   for (const s of view.sites) {
-    const hits = frames.filter((f) => f.ar_sites.includes(s.name));
+    const methods = [{ key: "ar_sites", cls: "ar", label: "vIVT" }];
+    if (frames.some((f) => f.ar_sites_iwv)) methods.push({ key: "ar_sites_iwv", cls: "ar-iwv", label: "IWV" });
+    const hits = frames.filter((f) => methods.some((m) => (f[m.key] || []).includes(s.name)));
     const div = document.createElement("div");
     div.className = "site";
     const head = document.createElement("div");
@@ -271,22 +273,31 @@ function buildSites() {
     if (hits.length) { status.className = "badge"; status.textContent = t("ar_from")(hits[0].short); }
     else { status.className = "muted small"; status.textContent = t("no_ar"); }
     head.append(name, status);
-    const strip = document.createElement("div");
-    strip.className = "strip";
-    frames.forEach((f, i) => {
-      const b = document.createElement("button");
-      const ar = f.ar_sites.includes(s.name);
-      if (ar) b.classList.add("ar");
-      b.title = `${f.label}${ar ? " · " + t("ar") : ""}`;
-      b.setAttribute("aria-label", b.title);
-      b.dataset.i = i;
-      b.onclick = () => show(i);
-      strip.appendChild(b);
+    const rows = methods.map((m) => {
+      const row = document.createElement("div");
+      row.className = "strip-row";
+      const lab = document.createElement("span");
+      lab.className = `strip-label ${m.cls}`;
+      lab.textContent = m.label;
+      const strip = document.createElement("div");
+      strip.className = "strip";
+      frames.forEach((f, i) => {
+        const b = document.createElement("button");
+        const ar = (f[m.key] || []).includes(s.name);
+        if (ar) b.classList.add(m.cls);
+        b.title = `${f.label} · ${m.label}${ar ? " · " + t("ar") : ""}`;
+        b.setAttribute("aria-label", b.title);
+        b.dataset.i = i;
+        b.onclick = () => show(i);
+        strip.appendChild(b);
+      });
+      row.append(lab, strip);
+      return row;
     });
     const axis = document.createElement("div");
     axis.className = "axis";
     if (frames.length) axis.innerHTML = `<span>${frames[0].short}</span><span>${frames[frames.length - 1].short}</span>`;
-    div.append(head, strip, axis);
+    div.append(head, ...rows, axis);
     box.appendChild(div);
   }
 }

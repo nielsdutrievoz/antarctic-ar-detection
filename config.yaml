@@ -36,6 +36,7 @@ climatology:
   hours: ["00:00", "06:00", "12:00", "18:00"]
   download_dir: data/era5            # ~6 Go à 0.5° pour 30 ans (supprimable une fois les seuils calculés)
   output: data/thresholds_vivt.nc    # seuils 98e percentile, 12 mois (un fichier par variable)
+  output_iwv: data/thresholds_iwv.nc # seuils IWV (Wille et al. 2019), 2e contour sur les cartes
 
 # --- Prévision ECMWF ENS (open data) ------------------------------------------
 forecast:
@@ -84,8 +85,8 @@ events:
     start: 2018-12-16
     end: 2018-12-24
     title:
-      fr: "Décembre 2018 : rivière atmosphérique atlantique jusqu'à Concordia"
-      en: "December 2018: Atlantic atmospheric river reaching Concordia"
+      fr: "Décembre 2018 · Antarctique de l'Est"
+      en: "December 2018 · East Antarctica"
     description:
       fr: "Rivière atmosphérique d'origine atlantique, arrivée sur la Terre de Coats (ouest de la Terre de la Reine-Maud) le 17 décembre, puis traversée du plateau jusqu'à Concordia du 19 au 23 décembre. Le 21 décembre, la température à Concordia a atteint −14,7 °C, la deuxième plus élevée depuis 2005. Sur ces cartes, l'algorithme détecte l'AR à son arrivée sur la Terre de Coats (17–19 décembre) ; sa progression sur le plateau, où l'IVT reste faible en valeur absolue, ne remplit plus le critère des 20° de latitude et n'est donc pas contourée."
       en: "Atlantic-sourced atmospheric river that made landfall over Coats Land (western Dronning Maud Land) on 17 December, then crossed the plateau to Concordia from 19 to 23 December. On 21 December the temperature at Concordia reached −14.7 °C, the second highest since 2005. On these maps the algorithm detects the AR at landfall over Coats Land (17–19 December); its progression over the plateau, where IVT remains low in absolute terms, no longer meets the 20°-latitude criterion and is therefore not contoured."
@@ -96,8 +97,8 @@ events:
     start: 2022-02-04
     end: 2022-02-11
     title:
-      fr: "Février 2022 : AR intense et records de chaleur sur la Péninsule"
-      en: "February 2022: intense AR and record heat on the Peninsula"
+      fr: "Février 2022 · Péninsule antarctique"
+      en: "February 2022 · Antarctic Peninsula"
     description:
       fr: "Rivière atmosphérique intense guidée vers la Péninsule antarctique par une dépression de la mer d'Amundsen anormale et un anticyclone record à l'est de la Péninsule. Les 7 et 8 février 2022, records absolus de température à King Sejong (13,7 °C), Carlini (13,6 °C), Vernadsky (12,7 °C) et Palmer (11,6 °C), avec une fonte de surface record."
       en: "Intense atmospheric river steered towards the Antarctic Peninsula by an anomalous Amundsen Sea Low and a record-breaking high-pressure system east of the Peninsula. On 7–8 February 2022, all-time temperature records at King Sejong (13.7 °C), Carlini (13.6 °C), Vernadsky (12.7 °C) and Palmer (11.6 °C), with record surface melt."
@@ -108,8 +109,8 @@ events:
     start: 2022-03-13
     end: 2022-03-21
     title:
-      fr: "Mars 2022 : vague de chaleur en Antarctique de l'Est"
-      en: "March 2022: East Antarctic heatwave"
+      fr: "Mars 2022 · Antarctique de l'Est"
+      en: "March 2022 · East Antarctica"
     description:
       fr: "Rivière atmosphérique issue du secteur de l'océan Indien (15–19 mars 2022), à l'origine de la vague de chaleur record sur le plateau de l'Antarctique de l'Est, avec des températures exceptionnelles à Concordia le 18 mars."
       en: "Atmospheric river from the Indian Ocean sector (15–19 March 2022) that drove the record-breaking heatwave over the East Antarctic plateau, with exceptional temperatures at Concordia on 18 March."
