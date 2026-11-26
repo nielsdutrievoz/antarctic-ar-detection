@@ -125,7 +125,7 @@ def build(cfg: dict, ev: dict, out_root: Path, workers: int) -> dict:
         for l in maprender.LANGS:
             gif = ev_dir / f"{ev['id']}_{a}_{l}.gif"
             maprender.make_gif([(str(ev_dir / l / fr["file"]), str(ev_dir / l / a / fr["file"])) for fr in frames],
-                               str(gif), width=600)
+                               str(gif), width=480)
             gifs.setdefault(a, {})[l] = f"{ev['id']}/{gif.name}"
         print(f"  GIF {a} : {gif.stat().st_size / 1e6:.1f} Mo", flush=True)
 

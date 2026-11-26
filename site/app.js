@@ -16,6 +16,44 @@ const I18N = {
     tab_forecast: "Prévision",
     tab_events: "Événements passés",
     tab_method: "Méthode",
+    tab_alert: "Alerte",
+    alert_eyebrow: "Alerte par e-mail",
+    alert_title: "Être prévenu quand un AR approche",
+    alert_intro: "Choisis un lieu et un ou plusieurs algorithmes : tu recevras un e-mail dès qu'une rivière atmosphérique y est prévue dans les cinq prochains jours, avec l'animation de la situation synoptique autour de l'Antarctique.",
+    f_email: "Adresse e-mail",
+    f_where: "Lieu surveillé",
+    f_station: "Station",
+    f_coords: "Coordonnées",
+    f_lat: "Latitude (°, négative au sud)",
+    f_lon: "Longitude (°E, de −180 à 180)",
+    f_radius: "Un AR est signalé s'il passe à moins de 100 km du lieu choisi.",
+    f_algos: "Algorithme(s)",
+    f_lang: "Langue des e-mails",
+    f_consent: "J'accepte que mon adresse e-mail et le lieu choisi soient conservés uniquement pour l'envoi de ces alertes. Je peux me désinscrire à tout moment via le lien présent dans chaque e-mail.",
+    f_submit: "S'inscrire à l'alerte",
+    alert_where: "Lieu choisi",
+    alert_how: "Fonctionnement",
+    alert_steps: [
+      "Après l'inscription, un e-mail de confirmation t'est envoyé : l'alerte n'est active qu'une fois le lien cliqué.",
+      "À chaque nouvelle prévision (00 et 12 UTC), les algorithmes choisis sont appliqués au lieu surveillé.",
+      "Un e-mail est envoyé quand un nouvel AR y est prévu : date d'arrivée, algorithme(s), animation de la situation synoptique et lien vers le site.",
+      "Pas de nouvel e-mail tant que le même AR reste prévu.",
+      "Produit expérimental de recherche, sans garantie : ne pas utiliser pour la sécurité des opérations de terrain.",
+    ],
+    err_email: "Adresse e-mail invalide.",
+    err_where: "Coordonnées invalides : latitude entre −90 et −40°, longitude entre −180 et 180°.",
+    err_algos: "Choisis au moins un algorithme.",
+    err_consent: "Merci d'accepter la conservation des données pour recevoir les alertes.",
+    wille_limit: "indisponible au sud de 85°S",
+    pick_label: (name, lat, lon) => `${name ? name + " · " : ""}${lat}, ${lon}`,
+    sub_soon: (sum) => `Inscription prête : ${sum}. Les inscriptions ouvrent très prochainement ; rien n'a été envoyé pour le moment.`,
+    sub_ok: (email) => `C'est presque fini : un e-mail de confirmation a été envoyé à ${email}. Clique sur le lien qu'il contient pour activer l'alerte.`,
+    sub_fail: "L'inscription n'a pas pu être enregistrée. Réessaie plus tard.",
+    link_wait: "Traitement du lien…",
+    link_confirmed: (p) => `Alerte activée pour ${p}. Tu recevras un e-mail dès qu'un AR y sera prévu.`,
+    link_unsubscribed: (p) => `Désinscription effectuée pour ${p}. Tu ne recevras plus d'alerte pour ce lieu.`,
+    link_fail: "Ce lien n'est pas valide ou a expiré.",
+    station_groups: { peninsula: "Péninsule antarctique", east: "Antarctique de l'Est", west: "Antarctique de l'Ouest et mer de Ross", plateau: "Plateau" },
     refs_label: "Références",
     method_more: "Méthode détaillée, références et catalogue →",
     download_image: "Télécharger l'image",
@@ -61,6 +99,44 @@ const I18N = {
     tab_forecast: "Forecast",
     tab_events: "Past events",
     tab_method: "Method",
+    tab_alert: "Alert",
+    alert_eyebrow: "Email alert",
+    alert_title: "Get notified when an AR is coming",
+    alert_intro: "Choose a location and one or more algorithms: you will receive an email as soon as an atmospheric river is forecast there within the next five days, with an animation of the synoptic situation around Antarctica.",
+    f_email: "Email address",
+    f_where: "Location",
+    f_station: "Station",
+    f_coords: "Coordinates",
+    f_lat: "Latitude (°, negative south)",
+    f_lon: "Longitude (°E, −180 to 180)",
+    f_radius: "An AR is reported when it passes within 100 km of the chosen location.",
+    f_algos: "Algorithm(s)",
+    f_lang: "Email language",
+    f_consent: "I agree that my email address and the chosen location are stored only to send these alerts. I can unsubscribe at any time through the link in every email.",
+    f_submit: "Subscribe to the alert",
+    alert_where: "Selected location",
+    alert_how: "How it works",
+    alert_steps: [
+      "After subscribing, you receive a confirmation email: the alert is only active once you click its link.",
+      "With each new forecast (00 and 12 UTC), the selected algorithms are applied at your location.",
+      "An email is sent when a new AR is forecast there: arrival time, algorithm(s), synoptic animation and a link to the site.",
+      "No new email while the same AR remains forecast.",
+      "Experimental research product, no warranty: do not use for field-operation safety.",
+    ],
+    err_email: "Invalid email address.",
+    err_where: "Invalid coordinates: latitude between −90 and −40°, longitude between −180 and 180°.",
+    err_algos: "Choose at least one algorithm.",
+    err_consent: "Please accept data storage to receive alerts.",
+    wille_limit: "unavailable south of 85°S",
+    pick_label: (name, lat, lon) => `${name ? name + " · " : ""}${lat}, ${lon}`,
+    sub_soon: (sum) => `Subscription ready: ${sum}. Subscriptions open very soon; nothing has been sent yet.`,
+    sub_ok: (email) => `Almost done: a confirmation email was sent to ${email}. Click the link inside to activate the alert.`,
+    sub_fail: "The subscription could not be saved. Please try again later.",
+    link_wait: "Processing the link…",
+    link_confirmed: (p) => `Alert activated for ${p}. You will receive an email as soon as an AR is forecast there.`,
+    link_unsubscribed: (p) => `Unsubscribed from ${p}. You will no longer receive alerts for this location.`,
+    link_fail: "This link is invalid or has expired.",
+    station_groups: { peninsula: "Antarctic Peninsula", east: "East Antarctica", west: "West Antarctica and Ross Sea", plateau: "Plateau" },
     refs_label: "References",
     method_more: "Detailed method, references and catalogue →",
     download_image: "Download image",
@@ -96,6 +172,8 @@ const I18N = {
 
 /* ------------------------------------------------------------------ état */
 const $ = (id) => document.getElementById(id);
+/* Onglet Alerte : masqué tant que l'envoi des e-mails n'est pas en service. */
+const ALERT_ENABLED = false;
 const state = { lang: "fr", tab: "forecast", eventId: null, current: 0, timer: null, algo: null };
 const ALGOS = {
   wille_vivt: { label: "Wille vIVT", color: "#00b8d4" },
@@ -126,6 +204,7 @@ async function init() {
   $("next").onclick = () => show(state.current + 1);
   $("play").onclick = toggle;
   $("dl-image").onclick = downloadImage;
+  setupAlert();
   document.querySelectorAll("[data-goto]").forEach((a) => (a.onclick = (e) => {
     e.preventDefault(); state.tab = a.dataset.goto; stop(); save(); render(); window.scrollTo({ top: 0, behavior: "smooth" });
   }));
@@ -137,6 +216,7 @@ async function init() {
   });
   window.addEventListener("hashchange", () => { readUrl(); render(); });
   render();
+  handleAlertLink();
 }
 
 async function getJson(url) {
@@ -158,7 +238,7 @@ function readUrl() {
   try { storedAlgo = localStorage.getItem("ar-algo"); } catch { /* ignore */ }
   state.algo = qa in ALGOS ? qa : (storedAlgo in ALGOS ? storedAlgo : state.algo);
   const [tab, id] = location.hash.replace(/^#/, "").split("/");
-  state.tab = ["events", "method"].includes(tab) ? tab : "forecast";
+  state.tab = ["events", "method", ...(ALERT_ENABLED ? ["alert"] : [])].includes(tab) ? tab : "forecast";
   if (id) state.eventId = decodeURIComponent(id);
 }
 
@@ -178,8 +258,12 @@ function render() {
   document.title = L.doc_title;
   document.querySelectorAll("[data-i18n]").forEach((el) => (el.textContent = L[el.dataset.i18n]));
   document.querySelectorAll("[data-i18n-html]").forEach((el) => (el.innerHTML = L[el.dataset.i18nHtml]));
+  document.querySelectorAll("[data-i18n-list]").forEach((el) => {
+    el.replaceChildren(...L[el.dataset.i18nList].map((x) => Object.assign(document.createElement("li"), { textContent: x })));
+  });
   document.querySelectorAll("[data-lang]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.lang === state.lang));
   document.querySelectorAll("[data-tab]").forEach((b) => b.setAttribute("aria-selected", b.dataset.tab === state.tab));
+  document.querySelector('[data-tab="alert"]').hidden = !ALERT_ENABLED;
   $("prev").setAttribute("aria-label", L.prev);
   $("next").setAttribute("aria-label", L.next);
   $("map").alt = L.map_alt;
@@ -188,9 +272,11 @@ function render() {
   $("method").textContent = forecast && (forecast.algorithms || []).length ? L.detection_on(forecast.period) : (forecast ? L.detection_off : "");
 
   document.querySelectorAll("[data-only]").forEach((el) => (el.hidden = el.dataset.only !== state.lang));
-  const isMethod = state.tab === "method";
-  $("maps-page").hidden = isMethod;
+  const isMethod = state.tab === "method", isAlert = state.tab === "alert";
+  $("maps-page").hidden = isMethod || isAlert;
   $("method-page").hidden = !isMethod;
+  $("alert-page").hidden = !isAlert;
+  if (isAlert) { stop(); renderAlert(); return; }
   if (isMethod) { stop(); return; }
   if (state.tab === "forecast") renderForecast(); else renderEvents();
   setPlayLabel();
@@ -392,3 +478,210 @@ function setPlayLabel() {
 }
 
 init();
+
+/* ------------------------------------------------------------------ alerte */
+/* Projet Supabase qui enregistre les inscriptions (supabase/schema.sql). La clé « publishable »
+   est publique par conception : elle ne permet que d'ajouter une inscription et d'appeler les
+   fonctions de confirmation / désinscription. Tant que l'URL est vide, le formulaire valide les
+   champs et affiche un récapitulatif, sans rien envoyer. */
+const SUPABASE_URL = "https://fdbiyqlglprakjyrhfzh.supabase.co";
+const SUPABASE_KEY = "sb_publishable_6-bj3TwUbcU-AMnJgdWFiA_RqpkgLC4";
+const WILLE_SOUTH = -85;
+
+const STATIONS = [
+  ["peninsula", "Carlini", -62.24, -58.67], ["peninsula", "King Sejong", -62.22, -58.79],
+  ["peninsula", "Esperanza", -63.40, -56.98], ["peninsula", "Palmer", -64.77, -64.05],
+  ["peninsula", "Vernadsky", -65.25, -64.26], ["peninsula", "Rothera", -67.57, -68.13],
+  ["east", "Neumayer III", -70.67, -8.27], ["east", "Princess Elisabeth", -71.95, 23.35],
+  ["east", "Syowa", -69.00, 39.58], ["east", "Mawson", -67.60, 62.87],
+  ["east", "Davis", -68.58, 77.97], ["east", "Zhongshan", -69.37, 76.37],
+  ["east", "Casey", -66.28, 110.53], ["east", "Dumont d'Urville", -66.66, 140.00],
+  ["west", "Halley VI", -75.58, -26.66], ["west", "McMurdo", -77.85, 166.67],
+  ["west", "Mario Zucchelli", -74.69, 164.11], ["west", "Byrd", -80.01, -119.40],
+  ["plateau", "Concordia", -75.10, 123.35], ["plateau", "Vostok", -78.46, 106.84],
+  ["plateau", "Dome Fuji", -77.32, 39.70], ["plateau", "Kohnen", -75.00, 0.07],
+  ["plateau", "Amundsen-Scott (South Pole)", -90.0, 0.0],
+];
+
+/* Position d'un point sur les cartes du site : stéréographique polaire sud, longitude 0 en haut,
+   cercle limité à 30°S. Géométrie des PNG (8 × 8,6 in, axes [0.02, 0.15, 0.96, 0.79]). */
+const MAP_GEOM = { cx: 0.5, cy: 0.4550, rx: 0.42463, ry: 0.39500, latEdge: -30 };
+function mapXY(lat, lon) {
+  const k = (deg) => Math.tan(((90 + deg) / 2) * Math.PI / 180);
+  const r = k(lat) / k(MAP_GEOM.latEdge), a = lon * Math.PI / 180;
+  return [MAP_GEOM.cx + r * MAP_GEOM.rx * Math.sin(a), MAP_GEOM.cy - r * MAP_GEOM.ry * Math.cos(a)];
+}
+
+const alertState = { mode: "station", station: "Concordia", lang: null, algos: new Set(), touched: false };
+
+function setupAlert() {
+  const form = $("alert-form");
+  form.querySelectorAll('input[name="a-mode"]').forEach((r) => (r.onchange = () => { alertState.mode = r.value; updateAlert(); }));
+  form.querySelectorAll('input[name="a-lang"]').forEach((r) => (r.onchange = () => { alertState.lang = r.value; }));
+  $("a-station").onchange = () => { alertState.station = $("a-station").value; updateAlert(); };
+  ["a-lat", "a-lon"].forEach((id) => ($(id).oninput = updateAlert));
+  $("a-email").oninput = () => alertState.touched && validateAlert();
+  $("a-consent").onchange = () => alertState.touched && validateAlert();
+  form.onsubmit = submitAlert;
+}
+
+function renderAlert() {
+  const L = I18N[state.lang];
+  if (!alertState.lang) alertState.lang = state.lang;
+  document.querySelectorAll('input[name="a-lang"]').forEach((r) => (r.checked = r.value === alertState.lang));
+  // stations, regroupées par secteur
+  const sel = $("a-station");
+  sel.replaceChildren(...Object.entries(L.station_groups).map(([g, label]) => {
+    const og = document.createElement("optgroup");
+    og.label = label;
+    STATIONS.filter((x) => x[0] === g).forEach(([, name, lat, lon]) => {
+      og.append(new Option(`${name} (${Math.abs(lat).toFixed(2)}°S, ${Math.abs(lon).toFixed(2)}°${lon < 0 ? "W" : "E"})`, name));
+    });
+    return og;
+  }));
+  sel.value = alertState.station;
+  // fond de carte : première échéance de la prévision en cours
+  const f = forecast && forecast.frames && forecast.frames[0];
+  $("pickmap").hidden = !f;
+  if (f) $("pickmap-img").src = `maps/${state.lang}/${f.file}`;
+  $("pickmap-img").alt = L.map_alt;
+  updateAlert();
+}
+
+function alertPoint() {
+  if (alertState.mode === "station") {
+    const s = STATIONS.find((x) => x[1] === alertState.station);
+    return s ? { name: s[1], lat: s[2], lon: s[3] } : null;
+  }
+  const lat = parseFloat($("a-lat").value), lon = parseFloat($("a-lon").value);
+  if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < -90 || lat > -40 || lon < -180 || lon > 180) return null;
+  return { name: null, lat, lon };
+}
+
+function updateAlert() {
+  const L = I18N[state.lang];
+  $("a-station-box").hidden = alertState.mode !== "station";
+  $("a-coords-box").hidden = alertState.mode !== "coords";
+  const p = alertPoint();
+  // algorithmes : ceux du site ; Wille ne détecte rien au sud de 85°S
+  const box = $("a-algos");
+  const avail = Object.keys(ALGOS);
+  if (!alertState.algos.size) alertState.algos.add(state.algo && ALGOS[state.algo] ? state.algo : avail[0]);
+  box.replaceChildren(...avail.map((a) => {
+    const off = a.startsWith("wille") && p && p.lat < WILLE_SOUTH;
+    if (off) alertState.algos.delete(a);
+    const lab = document.createElement("label");
+    lab.className = off ? "disabled" : "";
+    const cb = Object.assign(document.createElement("input"), { type: "checkbox", value: a, checked: alertState.algos.has(a), disabled: off });
+    cb.onchange = () => { cb.checked ? alertState.algos.add(a) : alertState.algos.delete(a); alertState.touched && validateAlert(); };
+    const dot = Object.assign(document.createElement("span"), { className: "dot" });
+    dot.style.background = ALGOS[a].color;
+    lab.append(cb, dot, document.createTextNode(ALGOS[a].label + (off ? ` (${L.wille_limit})` : "")));
+    return lab;
+  }));
+  // repère sur la carte
+  const pin = $("pin");
+  pin.hidden = !p;
+  if (p) {
+    const [x, y] = mapXY(p.lat, p.lon);
+    pin.style.left = `${x * 100}%`;
+    pin.style.top = `${y * 100}%`;
+    $("pick-label").textContent = L.pick_label(p.name, `${Math.abs(p.lat).toFixed(2)}°S`,
+      `${Math.abs(p.lon).toFixed(2)}°${p.lon < 0 ? "W" : "E"}`);
+  } else {
+    $("pick-label").textContent = "";
+  }
+  if (alertState.touched) validateAlert();
+}
+
+function showErr(id, msg, input) {
+  $(id).hidden = !msg;
+  $(id).textContent = msg || "";
+  if (input) input.setAttribute("aria-invalid", msg ? "true" : "false");
+  return !msg;
+}
+
+function validateAlert() {
+  const L = I18N[state.lang];
+  const email = $("a-email").value.trim();
+  const okEmail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+  const ok = [
+    showErr("e-email", okEmail ? "" : L.err_email, $("a-email")),
+    showErr("e-where", alertPoint() ? "" : L.err_where),
+    showErr("e-algos", alertState.algos.size ? "" : L.err_algos),
+    showErr("e-consent", $("a-consent").checked ? "" : L.err_consent),
+  ];
+  return ok.every(Boolean);
+}
+
+async function submitAlert(e) {
+  e.preventDefault();
+  alertState.touched = true;
+  const L = I18N[state.lang];
+  const res = $("a-result");
+  res.hidden = true;
+  res.className = "notice";
+  if (!validateAlert()) return;
+  const p = alertPoint();
+  const sub = {
+    email: $("a-email").value.trim(),
+    station: p.name, lat: +p.lat.toFixed(2), lon: +p.lon.toFixed(2),
+    algorithms: [...alertState.algos], lang: alertState.lang,
+  };
+  if ($("a-website").value) return;          // champ piège : rempli seulement par les robots
+  if (!SUPABASE_URL) {
+    const place = p.name || `${sub.lat}, ${sub.lon}`;
+    res.textContent = L.sub_soon(`${place} · ${sub.algorithms.map((a) => ALGOS[a].label).join(", ")}`);
+    res.hidden = false;
+    return;
+  }
+  const btn = $("alert-form").querySelector('button[type="submit"]');
+  btn.disabled = true;
+  try {
+    const r = await supa("subscriptions", sub);
+    // 409 : déjà inscrit à ce lieu. Même message, pour ne pas révéler qui est inscrit.
+    if (!r.ok && r.status !== 409) throw new Error(r.status);
+    res.textContent = L.sub_ok(sub.email);
+    res.classList.add("ok");
+  } catch {
+    res.textContent = L.sub_fail;
+  }
+  btn.disabled = false;
+  res.hidden = false;
+}
+
+function supa(path, body) {
+  const headers = { "Content-Type": "application/json", apikey: SUPABASE_KEY, Prefer: "return=minimal" };
+  if (SUPABASE_KEY.startsWith("eyJ")) headers.Authorization = `Bearer ${SUPABASE_KEY}`;   // anciennes clés « anon »
+  return fetch(`${SUPABASE_URL}/rest/v1/${path}`, { method: "POST", headers, body: JSON.stringify(body) });
+}
+
+/* Liens des e-mails : ?confirm=<jeton> ou ?unsubscribe=<jeton> */
+async function handleAlertLink() {
+  const q = new URLSearchParams(location.search);
+  const action = q.has("confirm") ? "confirm" : q.has("unsubscribe") ? "unsubscribe" : null;
+  if (!action || !ALERT_ENABLED) return;
+  const token = q.get(action);
+  q.delete(action);
+  const url = new URL(location.href);
+  url.search = q.toString();
+  url.hash = "alert";
+  history.replaceState(null, "", url);
+  state.tab = "alert";
+  render();
+  const L = I18N[state.lang], box = $("alert-link-msg");
+  box.hidden = false;
+  box.className = "notice";
+  box.textContent = L.link_wait;
+  try {
+    if (!SUPABASE_URL || !/^[0-9a-f-]{36}$/i.test(token)) throw new Error("bad");
+    const r = await supa(`rpc/${action === "confirm" ? "confirm_subscription" : "unsubscribe"}`, { p_token: token });
+    if (!r.ok) throw new Error(r.status);
+    const place = await r.json();
+    if (!place) throw new Error("unknown");
+    box.textContent = action === "confirm" ? L.link_confirmed(place) : L.link_unsubscribed(place);
+    box.classList.add("ok");
+  } catch {
+    box.textContent = L.link_fail;
+  }
+}

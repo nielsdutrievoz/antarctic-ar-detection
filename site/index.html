@@ -33,6 +33,7 @@
         <button role="tab" data-tab="forecast" aria-selected="true" data-i18n="tab_forecast">Prévision</button>
         <button role="tab" data-tab="events" aria-selected="false" data-i18n="tab_events">Événements passés</button>
         <button role="tab" data-tab="method" aria-selected="false" data-i18n="tab_method">Méthode</button>
+        <button role="tab" data-tab="alert" aria-selected="false" data-i18n="tab_alert">Alerte</button>
       </nav>
     </div>
   </section>
@@ -213,6 +214,84 @@
         <li>ECMWF open data (IFS HRES), CC-BY-4.0. <a href="https://www.ecmwf.int/en/forecasts/datasets/open-data" target="_blank" rel="noopener">ecmwf.int</a></li>
       </ol>
     </section>
+  </main>
+
+
+  <main class="wrap alert-layout" id="alert-page" hidden>
+    <section class="panel">
+      <p class="eyebrow" data-i18n="alert_eyebrow">Alerte par e-mail</p>
+      <h2 data-i18n="alert_title">Être prévenu quand un AR approche</h2>
+      <p class="muted-p" data-i18n="alert_intro"></p>
+      <p class="notice" id="alert-link-msg" role="status" hidden></p>
+
+      <form id="alert-form" novalidate>
+        <div class="field">
+          <label for="a-email" data-i18n="f_email">Adresse e-mail</label>
+          <input id="a-email" type="email" autocomplete="email" required placeholder="nom@exemple.org">
+          <p class="err" id="e-email" hidden></p>
+        </div>
+
+        <fieldset class="field">
+          <legend data-i18n="f_where">Lieu surveillé</legend>
+          <div class="seg" role="radiogroup">
+            <label><input type="radio" name="a-mode" value="station" checked> <span data-i18n="f_station">Station</span></label>
+            <label><input type="radio" name="a-mode" value="coords"> <span data-i18n="f_coords">Coordonnées</span></label>
+          </div>
+          <div id="a-station-box">
+            <select id="a-station" aria-label="Station"></select>
+          </div>
+          <div id="a-coords-box" class="coords" hidden>
+            <div>
+              <label for="a-lat" data-i18n="f_lat">Latitude (°N, négative au sud)</label>
+              <input id="a-lat" type="number" step="0.01" min="-90" max="-40" placeholder="-75.10" inputmode="decimal">
+            </div>
+            <div>
+              <label for="a-lon" data-i18n="f_lon">Longitude (°E, −180 à 180)</label>
+              <input id="a-lon" type="number" step="0.01" min="-180" max="180" placeholder="123.35" inputmode="decimal">
+            </div>
+          </div>
+          <p class="err" id="e-where" hidden></p>
+          <p class="hint" data-i18n="f_radius"></p>
+        </fieldset>
+
+        <fieldset class="field">
+          <legend data-i18n="f_algos">Algorithme(s)</legend>
+          <div class="checks" id="a-algos"></div>
+          <p class="err" id="e-algos" hidden></p>
+        </fieldset>
+
+        <fieldset class="field">
+          <legend data-i18n="f_lang">Langue des e-mails</legend>
+          <div class="seg">
+            <label><input type="radio" name="a-lang" value="fr"> Français</label>
+            <label><input type="radio" name="a-lang" value="en"> English</label>
+          </div>
+        </fieldset>
+
+        <div class="hp" aria-hidden="true"><label for="a-website">Website</label><input id="a-website" type="text" tabindex="-1" autocomplete="off"></div>
+
+        <label class="consent"><input type="checkbox" id="a-consent"> <span data-i18n-html="f_consent"></span></label>
+        <p class="err" id="e-consent" hidden></p>
+
+        <div class="btn-row"><button type="submit" class="btn" data-i18n="f_submit">S'inscrire à l'alerte</button></div>
+        <p class="notice" id="a-result" role="status" hidden></p>
+      </form>
+    </section>
+
+    <aside class="side">
+      <section class="panel">
+        <p class="eyebrow" data-i18n="alert_where">Lieu choisi</p>
+        <div class="pickmap" id="pickmap">
+          <img id="pickmap-img" alt="">
+          <span class="pin" id="pin" hidden></span>
+        </div>
+        <p class="hint" id="pick-label"></p>
+      </section>
+      <section class="panel">
+        <p class="eyebrow" data-i18n="alert_how">Fonctionnement</p>
+        <ul class="small" data-i18n-list="alert_steps"></ul>
+      </section>
+    </aside>
   </main>
 
   <footer class="site-footer">

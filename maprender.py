@@ -186,18 +186,30 @@ def render(job: dict) -> list[str]:
     return written
 
 
-def make_gif(frames: list[tuple[str, str | None]], out: str, width: int = 640, ms: int = 450) -> None:
-    """Animation GIF à partir de couples (fond, calque) superposés, réduits à `width` pixels."""
+def make_gif(frames: list[tuple[str, str | None]], out: str, width: int = 640, ms: int = 450,
+             colors: int = 128) -> None:
+    """Animation GIF à partir de couples (fond, calque) superposés, réduits à `width` pixels.
+
+    Une palette commune, tirée de six images réparties sur l'animation, et sans tramage : les
+    zones identiques d'une image à l'autre le restent, ce qui divise la taille par deux environ.
+    """
     from PIL import Image
 
-    imgs = []
+    rgb = []
     for base, layer in frames:
         im = Image.open(base).convert("RGBA")
         if layer:
             im = Image.alpha_composite(im, Image.open(layer).convert("RGBA"))
         im = im.convert("RGB")
         h = round(im.height * width / im.width)
-        imgs.append(im.resize((width, h), Image.LANCZOS).quantize(colors=256, method=Image.Quantize.MEDIANCUT))
+        rgb.append(im.resize((width, h), Image.LANCZOS))
+    pick = sorted({round(i * (len(rgb) - 1) / 5) for i in range(6)})
+    W, H = rgb[0].size
+    mosaic = Image.new("RGB", (W * len(pick), H))
+    for k, i in enumerate(pick):
+        mosaic.paste(rgb[i], (k * W, 0))
+    pal = mosaic.quantize(colors=colors, method=Image.Quantize.MEDIANCUT)
+    imgs = [im.quantize(palette=pal, dither=Image.Dither.NONE) for im in rgb]
     durations = [ms] * len(imgs)
     durations[-1] = ms * 4                     # pause sur la dernière image
     imgs[0].save(out, save_all=True, append_images=imgs[1:], duration=durations, loop=0, optimize=True)

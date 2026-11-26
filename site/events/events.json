@@ -8,214 +8,425 @@
    "en": "December 2018"
   },
   "description": {
-   "fr": "Rivière atmosphérique d'origine atlantique, arrivée sur la Terre de Coats (ouest de la Terre de la Reine-Maud) le 17 décembre, puis traversée du plateau jusqu'à Concordia du 19 au 23 décembre. Le 21 décembre, la température à Concordia a atteint −14,7 °C, la deuxième plus élevée depuis 2005. Sur ces cartes, l'algorithme détecte l'AR à son arrivée sur la Terre de Coats (17–19 décembre) ; sa progression sur le plateau, où l'IVT reste faible en valeur absolue, ne remplit plus le critère des 20° de latitude et n'est donc pas contourée.",
-   "en": "Atlantic-sourced atmospheric river that made landfall over Coats Land (western Dronning Maud Land) on 17 December, then crossed the plateau to Concordia from 19 to 23 December. On 21 December the temperature at Concordia reached −14.7 °C, the second highest since 2005. On these maps the algorithm detects the AR at landfall over Coats Land (17–19 December); its progression over the plateau, where IVT remains low in absolute terms, no longer meets the 20°-latitude criterion and is therefore not contoured."
+   "fr": "Rivière atmosphérique d'origine atlantique, arrivée sur la Terre de Coats (ouest de la Terre de la Reine-Maud) le 17 décembre, puis traversée du plateau jusqu'à Concordia du 19 au 23 décembre. Le 21 décembre, la température à Concordia a atteint −14,7 °C, la deuxième plus élevée depuis 2005. Les trois algorithmes détectent l'AR à son arrivée sur la Terre de Coats, près de Neumayer III (17–19 décembre). Sur le plateau, seul DARK le suit jusqu'à Concordia (20–23 décembre) : la vapeur d'eau y est pourtant anormale (IWV deux fois supérieur au seuil le 21 décembre), mais la zone ne couvre qu'environ 12° de latitude, sous le critère de 20° des méthodes de Wille, et le transport y est orienté vers le nord, ce que vIVT ignore.",
+   "en": "Atlantic-sourced atmospheric river that made landfall over Coats Land (western Dronning Maud Land) on 17 December, then crossed the plateau to Concordia from 19 to 23 December. On 21 December the temperature at Concordia reached −14.7 °C, the second highest since 2005. All three algorithms detect the AR at landfall over Coats Land, near Neumayer III (17–19 December). Over the plateau only DARK tracks it to Concordia (20–23 December): water vapour there is clearly anomalous (IWV twice the threshold on 21 December), but the moist area spans only about 12° of latitude, below the 20° criterion of the Wille methods, and the transport points northward, which vIVT ignores."
   },
   "reference": {
    "text": "Dutrievoz et al. (2026), The Cryosphere 20, 1025–1046",
    "url": "https://doi.org/10.5194/tc-20-1025-2026"
   },
+  "algorithms": [
+   "wille_vivt",
+   "wille_iwv",
+   "dark"
+  ],
   "frames": [
    {
     "time": "2018-12-16T00:00Z",
     "file": "20181216_00.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2018-12-16T06:00Z",
     "file": "20181216_06.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2018-12-16T12:00Z",
     "file": "20181216_12.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2018-12-16T18:00Z",
     "file": "20181216_18.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2018-12-17T00:00Z",
     "file": "20181217_00.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2018-12-17T06:00Z",
     "file": "20181217_06.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2018-12-17T12:00Z",
     "file": "20181217_12.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2018-12-17T18:00Z",
     "file": "20181217_18.png",
-    "ar_sites": [
-     "Neumayer III"
-    ]
+    "ar": {
+     "wille_vivt": [
+      "Neumayer III"
+     ],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2018-12-18T00:00Z",
     "file": "20181218_00.png",
-    "ar_sites": [
-     "Neumayer III"
-    ]
+    "ar": {
+     "wille_vivt": [
+      "Neumayer III"
+     ],
+     "wille_iwv": [],
+     "dark": [
+      "Neumayer III"
+     ]
+    }
    },
    {
     "time": "2018-12-18T06:00Z",
     "file": "20181218_06.png",
-    "ar_sites": [
-     "Neumayer III"
-    ]
+    "ar": {
+     "wille_vivt": [
+      "Neumayer III"
+     ],
+     "wille_iwv": [
+      "Neumayer III"
+     ],
+     "dark": [
+      "Neumayer III"
+     ]
+    }
    },
    {
     "time": "2018-12-18T12:00Z",
     "file": "20181218_12.png",
-    "ar_sites": [
-     "Neumayer III"
-    ]
+    "ar": {
+     "wille_vivt": [
+      "Neumayer III"
+     ],
+     "wille_iwv": [
+      "Neumayer III"
+     ],
+     "dark": [
+      "Neumayer III"
+     ]
+    }
    },
    {
     "time": "2018-12-18T18:00Z",
     "file": "20181218_18.png",
-    "ar_sites": [
-     "Neumayer III"
-    ]
+    "ar": {
+     "wille_vivt": [
+      "Neumayer III"
+     ],
+     "wille_iwv": [
+      "Neumayer III"
+     ],
+     "dark": [
+      "Neumayer III"
+     ]
+    }
    },
    {
     "time": "2018-12-19T00:00Z",
     "file": "20181219_00.png",
-    "ar_sites": [
-     "Neumayer III"
-    ]
+    "ar": {
+     "wille_vivt": [
+      "Neumayer III"
+     ],
+     "wille_iwv": [
+      "Neumayer III"
+     ],
+     "dark": [
+      "Neumayer III"
+     ]
+    }
    },
    {
     "time": "2018-12-19T06:00Z",
     "file": "20181219_06.png",
-    "ar_sites": [
-     "Neumayer III"
-    ]
+    "ar": {
+     "wille_vivt": [
+      "Neumayer III"
+     ],
+     "wille_iwv": [
+      "Neumayer III"
+     ],
+     "dark": [
+      "Neumayer III"
+     ]
+    }
    },
    {
     "time": "2018-12-19T12:00Z",
     "file": "20181219_12.png",
-    "ar_sites": [
-     "Neumayer III"
-    ]
+    "ar": {
+     "wille_vivt": [
+      "Neumayer III"
+     ],
+     "wille_iwv": [
+      "Neumayer III"
+     ],
+     "dark": [
+      "Neumayer III"
+     ]
+    }
    },
    {
     "time": "2018-12-19T18:00Z",
     "file": "20181219_18.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [
+      "Neumayer III"
+     ],
+     "dark": [
+      "Neumayer III"
+     ]
+    }
    },
    {
     "time": "2018-12-20T00:00Z",
     "file": "20181220_00.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2018-12-20T06:00Z",
     "file": "20181220_06.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2018-12-20T12:00Z",
     "file": "20181220_12.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2018-12-20T18:00Z",
     "file": "20181220_18.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2018-12-21T00:00Z",
     "file": "20181221_00.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2018-12-21T06:00Z",
     "file": "20181221_06.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2018-12-21T12:00Z",
     "file": "20181221_12.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2018-12-21T18:00Z",
     "file": "20181221_18.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2018-12-22T00:00Z",
     "file": "20181222_00.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2018-12-22T06:00Z",
     "file": "20181222_06.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2018-12-22T12:00Z",
     "file": "20181222_12.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2018-12-22T18:00Z",
     "file": "20181222_18.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2018-12-23T00:00Z",
     "file": "20181223_00.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2018-12-23T06:00Z",
     "file": "20181223_06.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2018-12-23T12:00Z",
     "file": "20181223_12.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2018-12-23T18:00Z",
     "file": "20181223_18.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2018-12-24T00:00Z",
     "file": "20181224_00.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2018-12-24T06:00Z",
     "file": "20181224_06.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2018-12-24T12:00Z",
     "file": "20181224_12.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2018-12-24T18:00Z",
     "file": "20181224_18.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    }
   ],
   "gif": {
-   "fr": "2018-12-concordia/2018-12-concordia_fr.gif",
-   "en": "2018-12-concordia/2018-12-concordia_en.gif"
+   "wille_vivt": {
+    "fr": "2018-12-concordia/2018-12-concordia_wille_vivt_fr.gif",
+    "en": "2018-12-concordia/2018-12-concordia_wille_vivt_en.gif"
+   },
+   "wille_iwv": {
+    "fr": "2018-12-concordia/2018-12-concordia_wille_iwv_fr.gif",
+    "en": "2018-12-concordia/2018-12-concordia_wille_iwv_en.gif"
+   },
+   "dark": {
+    "fr": "2018-12-concordia/2018-12-concordia_dark_fr.gif",
+    "en": "2018-12-concordia/2018-12-concordia_dark_en.gif"
+   }
   }
  },
  {
@@ -234,173 +445,330 @@
    "text": "Gorodetskaya et al. (2023), npj Climate and Atmospheric Science 6, 202",
    "url": "https://doi.org/10.1038/s41612-023-00529-6"
   },
+  "algorithms": [
+   "wille_vivt",
+   "wille_iwv",
+   "dark"
+  ],
   "frames": [
    {
     "time": "2022-02-04T00:00Z",
     "file": "20220204_00.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [
+      "Neumayer III"
+     ],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-04T06:00Z",
     "file": "20220204_06.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [
+      "Neumayer III"
+     ],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-04T12:00Z",
     "file": "20220204_12.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [
+      "Neumayer III"
+     ],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-04T18:00Z",
     "file": "20220204_18.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [
+      "Neumayer III"
+     ],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-05T00:00Z",
     "file": "20220205_00.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [
+      "Neumayer III"
+     ],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-05T06:00Z",
     "file": "20220205_06.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-05T12:00Z",
     "file": "20220205_12.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-05T18:00Z",
     "file": "20220205_18.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-06T00:00Z",
     "file": "20220206_00.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-06T06:00Z",
     "file": "20220206_06.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-06T12:00Z",
     "file": "20220206_12.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-06T18:00Z",
     "file": "20220206_18.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-07T00:00Z",
     "file": "20220207_00.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-07T06:00Z",
     "file": "20220207_06.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-07T12:00Z",
     "file": "20220207_12.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-07T18:00Z",
     "file": "20220207_18.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-08T00:00Z",
     "file": "20220208_00.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-08T06:00Z",
     "file": "20220208_06.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-08T12:00Z",
     "file": "20220208_12.png",
-    "ar_sites": [
-     "Dumont d'Urville"
-    ]
+    "ar": {
+     "wille_vivt": [
+      "Dumont d'Urville"
+     ],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-08T18:00Z",
     "file": "20220208_18.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-09T00:00Z",
     "file": "20220209_00.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-09T06:00Z",
     "file": "20220209_06.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-09T12:00Z",
     "file": "20220209_12.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Dumont d'Urville"
+     ]
+    }
    },
    {
     "time": "2022-02-09T18:00Z",
     "file": "20220209_18.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-10T00:00Z",
     "file": "20220210_00.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-10T06:00Z",
     "file": "20220210_06.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-10T12:00Z",
     "file": "20220210_12.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-10T18:00Z",
     "file": "20220210_18.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2022-02-11T00:00Z",
     "file": "20220211_00.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-11T06:00Z",
     "file": "20220211_06.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-11T12:00Z",
     "file": "20220211_12.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-02-11T18:00Z",
     "file": "20220211_18.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    }
   ],
   "gif": {
-   "fr": "2022-02-peninsula/2022-02-peninsula_fr.gif",
-   "en": "2022-02-peninsula/2022-02-peninsula_en.gif"
+   "wille_vivt": {
+    "fr": "2022-02-peninsula/2022-02-peninsula_wille_vivt_fr.gif",
+    "en": "2022-02-peninsula/2022-02-peninsula_wille_vivt_en.gif"
+   },
+   "wille_iwv": {
+    "fr": "2022-02-peninsula/2022-02-peninsula_wille_iwv_fr.gif",
+    "en": "2022-02-peninsula/2022-02-peninsula_wille_iwv_en.gif"
+   },
+   "dark": {
+    "fr": "2022-02-peninsula/2022-02-peninsula_dark_fr.gif",
+    "en": "2022-02-peninsula/2022-02-peninsula_dark_en.gif"
+   }
   }
  },
  {
@@ -419,220 +787,481 @@
    "text": "Wille et al. (2024), Journal of Climate 37, 757–778",
    "url": "https://doi.org/10.1175/JCLI-D-23-0175.1"
   },
+  "algorithms": [
+   "wille_vivt",
+   "wille_iwv",
+   "dark"
+  ],
   "frames": [
    {
     "time": "2022-03-13T00:00Z",
     "file": "20220313_00.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-03-13T06:00Z",
     "file": "20220313_06.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-03-13T12:00Z",
     "file": "20220313_12.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-03-13T18:00Z",
     "file": "20220313_18.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-03-14T00:00Z",
     "file": "20220314_00.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-03-14T06:00Z",
     "file": "20220314_06.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-03-14T12:00Z",
     "file": "20220314_12.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-03-14T18:00Z",
     "file": "20220314_18.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": []
+    }
    },
    {
     "time": "2022-03-15T00:00Z",
     "file": "20220315_00.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Dumont d'Urville"
+     ]
+    }
    },
    {
     "time": "2022-03-15T06:00Z",
     "file": "20220315_06.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Dumont d'Urville"
+     ]
+    }
    },
    {
     "time": "2022-03-15T12:00Z",
     "file": "20220315_12.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Dumont d'Urville"
+     ]
+    }
    },
    {
     "time": "2022-03-15T18:00Z",
     "file": "20220315_18.png",
-    "ar_sites": [
-     "Dumont d'Urville"
-    ]
+    "ar": {
+     "wille_vivt": [
+      "Dumont d'Urville"
+     ],
+     "wille_iwv": [],
+     "dark": [
+      "Dumont d'Urville",
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2022-03-16T00:00Z",
     "file": "20220316_00.png",
-    "ar_sites": [
-     "Dumont d'Urville",
-     "Concordia"
-    ]
+    "ar": {
+     "wille_vivt": [
+      "Dumont d'Urville",
+      "Concordia"
+     ],
+     "wille_iwv": [
+      "Dumont d'Urville",
+      "Concordia"
+     ],
+     "dark": [
+      "Dumont d'Urville",
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2022-03-16T06:00Z",
     "file": "20220316_06.png",
-    "ar_sites": [
-     "Concordia"
-    ]
+    "ar": {
+     "wille_vivt": [
+      "Concordia"
+     ],
+     "wille_iwv": [
+      "Dumont d'Urville",
+      "Concordia"
+     ],
+     "dark": [
+      "Dumont d'Urville",
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2022-03-16T12:00Z",
     "file": "20220316_12.png",
-    "ar_sites": [
-     "Concordia"
-    ]
+    "ar": {
+     "wille_vivt": [
+      "Concordia"
+     ],
+     "wille_iwv": [
+      "Dumont d'Urville",
+      "Concordia"
+     ],
+     "dark": [
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2022-03-16T18:00Z",
     "file": "20220316_18.png",
-    "ar_sites": [
-     "Dumont d'Urville",
-     "Concordia"
-    ]
+    "ar": {
+     "wille_vivt": [
+      "Dumont d'Urville",
+      "Concordia"
+     ],
+     "wille_iwv": [
+      "Dumont d'Urville",
+      "Concordia"
+     ],
+     "dark": [
+      "Dumont d'Urville",
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2022-03-17T00:00Z",
     "file": "20220317_00.png",
-    "ar_sites": [
-     "Dumont d'Urville",
-     "Concordia"
-    ]
+    "ar": {
+     "wille_vivt": [
+      "Dumont d'Urville",
+      "Concordia"
+     ],
+     "wille_iwv": [
+      "Dumont d'Urville",
+      "Concordia"
+     ],
+     "dark": [
+      "Dumont d'Urville",
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2022-03-17T06:00Z",
     "file": "20220317_06.png",
-    "ar_sites": [
-     "Dumont d'Urville",
-     "Concordia"
-    ]
+    "ar": {
+     "wille_vivt": [
+      "Dumont d'Urville",
+      "Concordia"
+     ],
+     "wille_iwv": [
+      "Dumont d'Urville",
+      "Concordia"
+     ],
+     "dark": [
+      "Dumont d'Urville",
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2022-03-17T12:00Z",
     "file": "20220317_12.png",
-    "ar_sites": [
-     "Dumont d'Urville",
-     "Concordia"
-    ]
+    "ar": {
+     "wille_vivt": [
+      "Dumont d'Urville",
+      "Concordia"
+     ],
+     "wille_iwv": [
+      "Dumont d'Urville",
+      "Concordia"
+     ],
+     "dark": [
+      "Dumont d'Urville",
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2022-03-17T18:00Z",
     "file": "20220317_18.png",
-    "ar_sites": [
-     "Dumont d'Urville",
-     "Concordia"
-    ]
+    "ar": {
+     "wille_vivt": [
+      "Dumont d'Urville",
+      "Concordia"
+     ],
+     "wille_iwv": [
+      "Dumont d'Urville",
+      "Concordia"
+     ],
+     "dark": [
+      "Dumont d'Urville",
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2022-03-18T00:00Z",
     "file": "20220318_00.png",
-    "ar_sites": [
-     "Dumont d'Urville",
-     "Concordia"
-    ]
+    "ar": {
+     "wille_vivt": [
+      "Dumont d'Urville",
+      "Concordia"
+     ],
+     "wille_iwv": [
+      "Dumont d'Urville",
+      "Concordia"
+     ],
+     "dark": [
+      "Dumont d'Urville",
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2022-03-18T06:00Z",
     "file": "20220318_06.png",
-    "ar_sites": [
-     "Concordia"
-    ]
+    "ar": {
+     "wille_vivt": [
+      "Concordia"
+     ],
+     "wille_iwv": [
+      "Dumont d'Urville",
+      "Concordia"
+     ],
+     "dark": [
+      "Dumont d'Urville",
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2022-03-18T12:00Z",
     "file": "20220318_12.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [
+      "Dumont d'Urville",
+      "Concordia"
+     ],
+     "dark": [
+      "Dumont d'Urville",
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2022-03-18T18:00Z",
     "file": "20220318_18.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Dumont d'Urville",
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2022-03-19T00:00Z",
     "file": "20220319_00.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Dumont d'Urville",
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2022-03-19T06:00Z",
     "file": "20220319_06.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2022-03-19T12:00Z",
     "file": "20220319_12.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2022-03-19T18:00Z",
     "file": "20220319_18.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2022-03-20T00:00Z",
     "file": "20220320_00.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2022-03-20T06:00Z",
     "file": "20220320_06.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2022-03-20T12:00Z",
     "file": "20220320_12.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2022-03-20T18:00Z",
     "file": "20220320_18.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2022-03-21T00:00Z",
     "file": "20220321_00.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2022-03-21T06:00Z",
     "file": "20220321_06.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2022-03-21T12:00Z",
     "file": "20220321_12.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Concordia"
+     ]
+    }
    },
    {
     "time": "2022-03-21T18:00Z",
     "file": "20220321_18.png",
-    "ar_sites": []
+    "ar": {
+     "wille_vivt": [],
+     "wille_iwv": [],
+     "dark": [
+      "Concordia"
+     ]
+    }
    }
   ],
   "gif": {
-   "fr": "2022-03-east-antarctica/2022-03-east-antarctica_fr.gif",
-   "en": "2022-03-east-antarctica/2022-03-east-antarctica_en.gif"
+   "wille_vivt": {
+    "fr": "2022-03-east-antarctica/2022-03-east-antarctica_wille_vivt_fr.gif",
+    "en": "2022-03-east-antarctica/2022-03-east-antarctica_wille_vivt_en.gif"
+   },
+   "wille_iwv": {
+    "fr": "2022-03-east-antarctica/2022-03-east-antarctica_wille_iwv_fr.gif",
+    "en": "2022-03-east-antarctica/2022-03-east-antarctica_wille_iwv_en.gif"
+   },
+   "dark": {
+    "fr": "2022-03-east-antarctica/2022-03-east-antarctica_dark_fr.gif",
+    "en": "2022-03-east-antarctica/2022-03-east-antarctica_dark_en.gif"
+   }
   }
  }
 ]
