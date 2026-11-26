@@ -681,11 +681,16 @@ async function submitAlert(e) {
   const btn = $("alert-form").querySelector('button[type="submit"]');
   btn.disabled = true;
   try {
-    // une ligne par lieu ; 409 : déjà inscrit à ce lieu. Même message, pour ne pas révéler qui est inscrit.
-    for (const sub of subs) {
-      const r = await supa("subscriptions", sub);
-      if (!r.ok && r.status !== 409) throw new Error(r.status);
-    }
+    // Tous les lieux en une requête : un seul déclenchement, donc un seul e-mail de confirmation.
+    // 409 : un des lieux est déjà inscrit ; on reprend alors lieu par lieu en ignorant les doublons
+    // (même message dans tous les cas, pour ne pas révéler qui est inscrit).
+    const r = await supa("subscriptions", subs);
+    if (r.status === 409) {
+      for (const sub of subs) {
+        const r1 = await supa("subscriptions", sub);
+        if (!r1.ok && r1.status !== 409) throw new Error(r1.status);
+      }
+    } else if (!r.ok) throw new Error(r.status);
     res.textContent = L.sub_ok(email, subs.length);
     res.classList.add("ok");
   } catch {
