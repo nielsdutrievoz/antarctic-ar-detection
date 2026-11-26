@@ -36,7 +36,8 @@ climatology:
   hours: ["00:00", "06:00", "12:00", "18:00"]
   download_dir: data/era5            # ~6 Go à 0.5° pour 30 ans (supprimable une fois les seuils calculés)
   output: data/thresholds_vivt.nc    # seuils 98e percentile, 12 mois (un fichier par variable)
-  output_iwv: data/thresholds_iwv.nc # seuils IWV (Wille et al. 2019), 2e contour sur les cartes
+  output_iwv: data/thresholds_iwv.nc # seuils IWV (Wille et al. 2019)
+  output_dark: data/thresholds_dark.nc # seuils DARK (Buffet et al. 2026), voir build_climatology_dark.py
 
 # --- Prévision ECMWF ENS (open data) ------------------------------------------
 forecast:
@@ -74,6 +75,7 @@ site:
   max_step_h: 120        # horizon des cartes (h)
   step_interval_h: 6
   plot_lat_north: -30.0  # bord nord de la carte polaire
+  data_lat_north: -15.0  # bord nord des données (domaine de DARK : 15–90°S)
   output_dir: site       # dossier publié sur GitHub Pages
   dpi: 150               # 8 x 8.6 pouces -> 1200 x 1290 px
   quiver_every: 8        # un vecteur IVT tous les N points de grille

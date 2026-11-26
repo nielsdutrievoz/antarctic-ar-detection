@@ -184,3 +184,26 @@ figure { margin: 0; }
 
 /* un élément masqué reste masqué même si une règle lui donne un display */
 [hidden] { display: none !important; }
+
+/* sélecteur d'algorithme */
+.algo-picker { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0 0 12px; }
+.algo-label { font-family: var(--head); font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-right: 4px; }
+.algo {
+  display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--card); color: var(--ink); font-family: var(--head); font-size: .8rem;
+}
+.algo::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--dot); box-shadow: 0 0 0 1.5px #0f1e2e; }
+.algo:hover { border-color: var(--accent); }
+.algo[aria-pressed="true"] { border-color: var(--ink); background: var(--accent-soft); font-weight: 600; }
+
+/* carte = fond + calque de contours superposés */
+.mapstack { position: relative; }
+.mapstack #layer { position: absolute; inset: 0; width: 100%; height: auto; background: transparent; }
+
+/* tableau comparatif des algorithmes */
+.table-wrap { overflow-x: auto; margin: 0 0 16px; }
+table.cmp { border-collapse: collapse; width: 100%; font-size: .88rem; min-width: 560px; }
+.cmp th, .cmp td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+.cmp thead th { font-family: var(--head); font-weight: 600; white-space: nowrap; }
+.cmp tbody th { font-family: var(--head); font-weight: 400; color: var(--muted); white-space: nowrap; }
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--dot); box-shadow: 0 0 0 1.5px #0f1e2e; margin-right: 6px; vertical-align: -1px; }

@@ -46,6 +46,7 @@
         <p id="event-desc"></p>
         <p class="small muted" id="event-ref"></p>
       </div>
+      <div class="algo-picker" id="algo-picker" role="group"></div>
       <div class="controls">
         <button id="prev" class="ctrl" aria-label="‹">‹</button>
         <button id="play" class="ctrl" aria-label="▶">▶</button>
@@ -53,8 +54,9 @@
         <input id="slider" type="range" min="0" max="0" value="0">
         <output id="label" for="slider"></output>
       </div>
-      <figure>
+      <figure class="mapstack">
         <img id="map" alt="">
+        <img id="layer" alt="" aria-hidden="true" hidden>
       </figure>
       <div class="btn-row left">
         <a id="dl-image" class="btn" download data-i18n="download_image">Télécharger l'image</a>
@@ -75,7 +77,7 @@
         <ul class="small">
           <li data-i18n-html="legend_ivt"></li>
           <li data-i18n-html="legend_msl"></li>
-          <li data-i18n-html="legend_ar"></li>
+          <li id="legend-ar"></li>
         </ul>
         <h3 data-i18n="method_title">Méthode</h3>
         <p class="small" id="method"></p>
@@ -89,7 +91,7 @@
     <article class="panel prose" lang="fr" data-only="fr">
       <p class="eyebrow">Méthode</p>
       <h2>Comment les rivières atmosphériques sont détectées</h2>
-      <p>Les rivières atmosphériques (AR) sont de longs couloirs étroits de transport intense de vapeur d'eau. En Antarctique, elles sont rares (quelques jours par an en un lieu donné) mais responsables d'une grande partie des chutes de neige extrêmes, des épisodes de fonte et des records de température. Ce site utilise l'algorithme développé pour l'Antarctique par Wille et al. (2019, 2021).</p>
+      <p>Les rivières atmosphériques (AR) sont de longs couloirs étroits de transport intense de vapeur d'eau. En Antarctique, elles sont rares (quelques jours par an en un lieu donné) mais responsables d'une grande partie des chutes de neige extrêmes, des épisodes de fonte et des records de température. Ce site propose trois algorithmes développés pour l'Antarctique : ceux de Wille et al. (2019, 2021) et DARK (Buffet et al. 2026). Les étapes ci-dessous décrivent celui de Wille (vIVT) ; les différences avec les deux autres sont résumées plus bas.</p>
 
       <h3>1. Transport de vapeur d'eau</h3>
       <p>Pour chaque point de grille, on calcule le transport intégré de vapeur d'eau, IVT = (1/g) ∫ q <b>V</b> dp, de la surface au sommet de la colonne, où q est l'humidité spécifique et <b>V</b> le vent. La détection n'utilise que sa composante méridienne (vIVT), comptée positivement vers le pôle Sud ; le transport vers le nord est mis à zéro. Les cartes montrent l'IVT total (couleurs et flèches).</p>
@@ -113,16 +115,30 @@
       <ul>
         <li>Les seuils viennent d'ERA5 (colonne complète) alors que les prévisions sont intégrées sur 8 niveaux : le vIVT prévu est légèrement sous-estimé, ce qui rend la détection un peu conservatrice.</li>
         <li>Le regroupement en objets est une réimplémentation (composantes connexes) du découpage du code original ; les contours peuvent légèrement différer de ceux des catalogues de Wille.</li>
-        <li>La détection s'arrête à 85°S, et le critère de 20° de latitude favorise les AR qui s'étendent depuis l'océan : un AR très avancé sur le plateau peut être manqué.</li>
+        <li>Pour les méthodes de Wille, la détection s'arrête à 85°S, et le critère de 20° de latitude favorise les AR qui s'étendent depuis l'océan : un AR très avancé sur le plateau peut être manqué (DARK lève cette limite).</li>
         <li>Les prévisions au-delà de 3 à 4 jours sont incertaines ; ce produit est expérimental.</li>
       </ul>
-      <div class="iwv-only"><h3>Deuxième méthode : vapeur d'eau totale (IWV)</h3>
-      <p>Les cartes montrent aussi, en <b>vert</b>, la variante de Wille et al. (2019) : le critère porte sur la colonne d'eau précipitable totale (IWV) au lieu du transport vers le pôle. Le seuil (98<sup>e</sup> percentile mensuel local, ERA5 1991–2020) et le critère de forme (≥ 20° de latitude, 37,5–85°S) sont les mêmes. Comme l'IWV ne dépend pas du sens du vent, cette méthode suit l'humidité d'un AR même quand elle circule vers le nord, par exemple après avoir traversé le plateau. C'est le cas de l'événement de décembre 2018, où le transport à Concordia était dirigé vers l'océan. La méthode vIVT (cyan) reste la plus sélective pour les intrusions venant de l'océan.</p></div>
+      <h3>Trois algorithmes au choix</h3>
+      <p>Le sélecteur au-dessus de la carte affiche le contour d'un des trois algorithmes. Les étapes 1 à 3 ci-dessus décrivent Wille vIVT ; les deux autres en diffèrent ainsi :</p>
+      <div class="table-wrap"><table class="cmp">
+        <thead><tr><th></th><th><span class="dot" style="--dot:#00b8d4"></span>Wille vIVT</th><th><span class="dot" style="--dot:#64dd17"></span>Wille IWV</th><th><span class="dot" style="--dot:#ff2bd6"></span>DARK</th></tr></thead>
+        <tbody>
+          <tr><th>Variable</th><td>transport de vapeur vers le pôle (composante méridienne de l'IVT)</td><td>vapeur d'eau totale de la colonne (IWV)</td><td>transport total de vapeur (IVT), toutes directions</td></tr>
+          <tr><th>Seuil</th><td>98<sup>e</sup> percentile, par mois</td><td>98<sup>e</sup> percentile, par mois</td><td>98<sup>e</sup> percentile, fenêtre glissante de 15 jours</td></tr>
+          <tr><th>Forme</th><td>≥ 20° de latitude</td><td>≥ 20° de latitude</td><td>axe central (courbe) ≥ 2000 km, surface ≥ 20 000 km²</td></tr>
+          <tr><th>Domaine</th><td>37,5–85°S</td><td>37,5–85°S</td><td>15–90°S, pôle compris</td></tr>
+          <tr><th>Point fort</th><td>intrusions venant de l'océan, liées aux fortes précipitations</td><td>suit l'humidité quel que soit le sens du vent</td><td>AR courbés, qui tournent ou traversent le pôle</td></tr>
+          <tr><th>Référence</th><td>Wille et al. (2021)</td><td>Wille et al. (2019)</td><td>Buffet et al. (2026)</td></tr>
+        </tbody>
+      </table></div>
+      <p><b>DARK</b> (<i>Detecting ARs using their Kurvature</i>) part du même principe d'intensité que Wille, mais supprime les contraintes de direction. Les points où l'IVT dépasse son 98<sup>e</sup> percentile sont regroupés en objets ; pour chaque objet, on extrait son squelette, puis l'axe central le plus long, qu'on lisse. L'objet est un AR si cet axe mesure au moins 2000 km le long de sa courbure (l'équivalent des 20° de latitude de Wille). Un AR qui tourne vers l'ouest le long de la côte, ou qui traverse le pôle et revient vers le nord, reste ainsi détecté. C'est le cas de l'AR de décembre 2018 à Concordia, où le transport était dirigé vers l'océan et que Wille vIVT ne voit pas.</p>
+      <p class="small muted">Adaptation sur ce site : seuils calculés par pentade (fenêtre de 15 jours centrée sur chaque période de 5 jours) plutôt que pour chaque jour ; surface minimale de 20 000 km² comme dans le code publié (v1.0) ; le module « AR-children », qui suit les restes d'AR après l'atterrissage, n'est pas inclus.</p>
 
       <h3>Catalogue et code</h3>
       <ul>
         <li><a href="https://scar.org/science/research-programmes/antclimnow/aci/atmospheric-river" target="_blank" rel="noopener">Catalogue des AR affectant l'Antarctique</a> (J. Wille, ERA5, méthodes vIVT et IWV), indicateurs climatiques SCAR AntClimNow</li>
         <li><a href="https://github.com/jwille45/Antarctic-lab" target="_blank" rel="noopener">Code de l'algorithme de détection</a> (J. Wille, GitHub ; archive <a href="https://doi.org/10.5281/zenodo.7990215" target="_blank" rel="noopener">Zenodo</a>)</li>
+        <li><a href="https://doi.org/10.5281/zenodo.17963007" target="_blank" rel="noopener">Catalogue DARK</a> (AR et AR-children, ERA5 1979–2023) et <a href="https://doi.org/10.5281/zenodo.20610709" target="_blank" rel="noopener">code de DARK</a> (V. Buffet, Zenodo)</li>
         <li><a href="https://gdex.ucar.edu/datasets/d651018/" target="_blank" rel="noopener">Catalogues ARTMIP Tier 2</a> (comparaison des algorithmes de détection, NCAR)</li>
         <li><a href="https://github.com/nielsdutrievoz/antarctic-ar-detection" target="_blank" rel="noopener">Code de ce site</a></li>
       </ul>
@@ -131,7 +147,7 @@
     <article class="panel prose" lang="en" data-only="en" hidden>
       <p class="eyebrow">Method</p>
       <h2>How atmospheric rivers are detected</h2>
-      <p>Atmospheric rivers (ARs) are long, narrow corridors of intense water vapour transport. In Antarctica they are rare (a few days per year at any given place) but account for a large share of extreme snowfall, surface melt episodes and temperature records. This site uses the algorithm developed for Antarctica by Wille et al. (2019, 2021).</p>
+      <p>Atmospheric rivers (ARs) are long, narrow corridors of intense water vapour transport. In Antarctica they are rare (a few days per year at any given place) but account for a large share of extreme snowfall, surface melt episodes and temperature records. This site offers three algorithms developed for Antarctica: those of Wille et al. (2019, 2021) and DARK (Buffet et al. 2026). The steps below describe Wille's (vIVT); the differences with the other two are summarised further down.</p>
 
       <h3>1. Water vapour transport</h3>
       <p>At each grid point we compute the integrated water vapour transport, IVT = (1/g) ∫ q <b>V</b> dp, from the surface to the top of the column, where q is specific humidity and <b>V</b> the wind. Detection uses only its meridional component (vIVT), counted positive towards the South Pole; northward transport is set to zero. The maps show total IVT (colours and arrows).</p>
@@ -155,16 +171,30 @@
       <ul>
         <li>Thresholds come from ERA5 (full column) while forecasts are integrated over 8 levels: forecast vIVT is slightly underestimated, which makes detection somewhat conservative.</li>
         <li>Object grouping is a re-implementation (connected components) of the slicing in the original code; contours may differ slightly from those of Wille's catalogues.</li>
-        <li>Detection stops at 85°S, and the 20°-latitude criterion favours ARs extending from the ocean: an AR far onto the plateau may be missed.</li>
+        <li>For Wille's methods, detection stops at 85°S, and the 20°-latitude criterion favours ARs extending from the ocean: an AR far onto the plateau may be missed (DARK removes this limit).</li>
         <li>Forecasts beyond 3–4 days are uncertain; this is an experimental product.</li>
       </ul>
-      <div class="iwv-only"><h3>Second method: total water vapour (IWV)</h3>
-      <p>The maps also show, in <b>green</b>, the Wille et al. (2019) variant: the criterion uses total precipitable water (IWV) instead of poleward transport. The threshold (local monthly 98th percentile, ERA5 1991–2020) and shape criterion (≥ 20° of latitude, 37.5–85°S) are the same. Because IWV does not depend on wind direction, this method follows the moisture of an AR even when it moves northward, for instance after crossing the plateau. This is the case for the December 2018 event, when transport at Concordia was directed towards the ocean. The vIVT method (cyan) remains the most selective for intrusions from the ocean.</p></div>
+      <h3>Three algorithms to choose from</h3>
+      <p>The selector above the map shows the contour of one of the three algorithms. Steps 1–3 above describe Wille vIVT; the other two differ as follows:</p>
+      <div class="table-wrap"><table class="cmp">
+        <thead><tr><th></th><th><span class="dot" style="--dot:#00b8d4"></span>Wille vIVT</th><th><span class="dot" style="--dot:#64dd17"></span>Wille IWV</th><th><span class="dot" style="--dot:#ff2bd6"></span>DARK</th></tr></thead>
+        <tbody>
+          <tr><th>Variable</th><td>poleward vapour transport (meridional IVT component)</td><td>total column water vapour (IWV)</td><td>total vapour transport (IVT), any direction</td></tr>
+          <tr><th>Threshold</th><td>98th percentile, per month</td><td>98th percentile, per month</td><td>98th percentile, 15-day rolling window</td></tr>
+          <tr><th>Shape</th><td>≥ 20° of latitude</td><td>≥ 20° of latitude</td><td>(curved) centre line ≥ 2000 km, area ≥ 20,000 km²</td></tr>
+          <tr><th>Domain</th><td>37.5–85°S</td><td>37.5–85°S</td><td>15–90°S, pole included</td></tr>
+          <tr><th>Strength</th><td>intrusions from the ocean, linked to heavy precipitation</td><td>follows moisture whatever the wind direction</td><td>curved ARs that turn or cross the pole</td></tr>
+          <tr><th>Reference</th><td>Wille et al. (2021)</td><td>Wille et al. (2019)</td><td>Buffet et al. (2026)</td></tr>
+        </tbody>
+      </table></div>
+      <p><b>DARK</b> (<i>Detecting ARs using their Kurvature</i>) builds on the same intensity principle as Wille but removes the directional constraints. Points where IVT exceeds its 98th percentile are grouped into objects; for each object, its skeleton is extracted, then the longest central axis, which is smoothed. The object is an AR if this axis is at least 2000 km long along its curvature (the equivalent of Wille's 20° of latitude). An AR that turns westward along the coast, or crosses the pole and heads back north, is therefore still detected. This is the case for the December 2018 AR at Concordia, where transport was directed towards the ocean and which Wille vIVT does not see.</p>
+      <p class="small muted">Adaptation on this site: thresholds computed per pentad (15-day window centred on each 5-day period) rather than for every day; minimum area of 20,000 km² as in the published code (v1.0); the "AR-children" module, which tracks AR remnants after landfall, is not included.</p>
 
       <h3>Catalogue and code</h3>
       <ul>
         <li><a href="https://scar.org/science/research-programmes/antclimnow/aci/atmospheric-river" target="_blank" rel="noopener">Catalogue of ARs affecting Antarctica</a> (J. Wille, ERA5, vIVT and IWV methods), SCAR AntClimNow climate indicators</li>
         <li><a href="https://github.com/jwille45/Antarctic-lab" target="_blank" rel="noopener">Detection algorithm code</a> (J. Wille, GitHub; <a href="https://doi.org/10.5281/zenodo.7990215" target="_blank" rel="noopener">Zenodo</a> archive)</li>
+        <li><a href="https://doi.org/10.5281/zenodo.17963007" target="_blank" rel="noopener">DARK catalogue</a> (ARs and AR-children, ERA5 1979–2023) and <a href="https://doi.org/10.5281/zenodo.20610709" target="_blank" rel="noopener">DARK code</a> (V. Buffet, Zenodo)</li>
         <li><a href="https://gdex.ucar.edu/datasets/d651018/" target="_blank" rel="noopener">ARTMIP Tier 2 catalogues</a> (intercomparison of AR detection algorithms, NCAR)</li>
         <li><a href="https://github.com/nielsdutrievoz/antarctic-ar-detection" target="_blank" rel="noopener">Source code of this site</a></li>
       </ul>
@@ -176,6 +206,7 @@
         <li>Wille, J. D., et al. (2019). West Antarctic surface melt triggered by atmospheric rivers. <i>Nature Geoscience</i>, 12, 911–916. <a href="https://doi.org/10.1038/s41561-019-0460-1" target="_blank" rel="noopener">doi:10.1038/s41561-019-0460-1</a></li>
         <li>Wille, J. D., et al. (2021). Antarctic atmospheric river climatology and precipitation impacts. <i>Journal of Geophysical Research: Atmospheres</i>, 126, e2020JD033788. <a href="https://doi.org/10.1029/2020JD033788" target="_blank" rel="noopener">doi:10.1029/2020JD033788</a></li>
         <li>Gorodetskaya, I. V., et al. (2023). Record-high Antarctic Peninsula temperatures and surface melt in February 2022: a compound event with an intense atmospheric river. <i>npj Climate and Atmospheric Science</i>, 6, 202. <a href="https://doi.org/10.1038/s41612-023-00529-6" target="_blank" rel="noopener">doi:10.1038/s41612-023-00529-6</a></li>
+        <li>Buffet, V., Favier, V., Pohl, B., and Wille, J. D. (2026). Curved atmospheric rivers and their moisture remnants: a new detection tool for Antarctica. <i>Weather and Climate Dynamics</i>, 7, 1189–1210. <a href="https://doi.org/10.5194/wcd-7-1189-2026" target="_blank" rel="noopener">doi:10.5194/wcd-7-1189-2026</a></li>
         <li>Wille, J. D., et al. (2024). The extraordinary March 2022 East Antarctica “heat” wave. Part I: Observations and meteorological drivers. <i>Journal of Climate</i>, 37, 757–778. <a href="https://doi.org/10.1175/JCLI-D-23-0175.1" target="_blank" rel="noopener">doi:10.1175/JCLI-D-23-0175.1</a></li>
         <li>Dutrievoz, N., et al. (2026). Water vapour isotope anomalies during an atmospheric river event at Dome C, East Antarctica. <i>The Cryosphere</i>, 20, 1025–1046. <a href="https://doi.org/10.5194/tc-20-1025-2026" target="_blank" rel="noopener">doi:10.5194/tc-20-1025-2026</a></li>
         <li>Hersbach, H., et al. (2020). The ERA5 global reanalysis. <i>Quarterly Journal of the Royal Meteorological Society</i>, 146, 1999–2049. <a href="https://doi.org/10.1002/qj.3803" target="_blank" rel="noopener">doi:10.1002/qj.3803</a></li>

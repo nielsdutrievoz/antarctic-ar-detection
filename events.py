@@ -25,6 +25,7 @@ import xarray as xr
 
 import arcore
 import maprender
+from detectors import Detectors
 
 VARS = {
     "uivt": "vertical_integral_of_eastward_water_vapour_flux",
@@ -36,47 +37,34 @@ VARS = {
 
 
 def download(cfg: dict, ev: dict) -> Path:
+    """ERA5 de l'événement (6-horaire, 0.5°) sur le domaine des données (site.data_lat_north → pôle)."""
     import cdsapi
 
     out = arcore.cfg_path(cfg, "data/events") / f"era5_{ev['id']}.nc"
-    missing = dict(VARS)
+    north = float(cfg["site"].get("data_lat_north", -15.0))
     if out.exists():
-        have = set(_open(out).data_vars)
-        missing = {k: v for k, v in VARS.items() if k not in have}
-        if not missing:
+        ds = _open(out)
+        if set(VARS) <= set(ds.data_vars) and float(ds["latitude"].max()) >= north - 1e-6:
             return out
+        out.unlink()                      # ancien fichier (domaine ou variables incomplets)
     out.parent.mkdir(parents=True, exist_ok=True)
     days = [ev["start"] + dt.timedelta(days=i) for i in range((ev["end"] - ev["start"]).days + 1)]
     res = float(cfg["detection"]["grid_res"])
-    north = float(cfg["site"]["plot_lat_north"])
-    # une requête par mois touché (le CDS attend des listes année/mois/jour)
     parts = []
     for ym in sorted({(d.year, d.month) for d in days}):
         part = out.with_name(f"{out.stem}_{ym[0]}{ym[1]:02d}.nc")
         print(f"[{ev['id']}] requête CDS {ym[0]}-{ym[1]:02d}…", flush=True)
         cdsapi.Client(quiet=True).retrieve(
             "reanalysis-era5-single-levels",
-            {
-                "product_type": ["reanalysis"],
-                "variable": list(missing.values()),
-                "year": [str(ym[0])],
-                "month": [f"{ym[1]:02d}"],
-                "day": [f"{d.day:02d}" for d in days if (d.year, d.month) == ym],
-                "time": ["00:00", "06:00", "12:00", "18:00"],
-                "area": [north, 0, -90, 360 - res],
-                "grid": [res, res],
-                "data_format": "netcdf",
-                "download_format": "unarchived",
-            },
-            str(part),
-        )
+            {"product_type": ["reanalysis"], "variable": list(VARS.values()),
+             "year": [str(ym[0])], "month": [f"{ym[1]:02d}"],
+             "day": [f"{d.day:02d}" for d in days if (d.year, d.month) == ym],
+             "time": ["00:00", "06:00", "12:00", "18:00"], "area": [north, 0, -90, 360 - res],
+             "grid": [res, res], "data_format": "netcdf", "download_format": "unarchived"},
+            str(part))
         parts.append(part)
     ds = xr.concat([_open(p) for p in parts], dim="time").sortby("time")
-    if out.exists():                      # ajoute les variables manquantes au fichier existant
-        ds = xr.merge([_open(out), ds])
-    tmp_out = out.with_suffix(".tmp.nc")
-    ds.to_netcdf(tmp_out)
-    tmp_out.replace(out)
+    ds.to_netcdf(out)
     for p in parts:
         p.unlink()
     return out
@@ -94,14 +82,11 @@ def _open(path: Path) -> xr.Dataset:
     return ds.sortby("latitude", ascending=False)
 
 
-def build(cfg: dict, ev: dict, thresholds: xr.Dataset, out_root: Path, workers: int,
-          thr_iwv: xr.Dataset | None = None) -> dict:
-    det = cfg["detection"]
+def build(cfg: dict, ev: dict, out_root: Path, workers: int) -> dict:
     ds = _open(download(cfg, ev))
     lat, lon = ds["latitude"].values, np.mod(ds["longitude"].values, 360.0)
-    dlat, dlon = arcore.target_grid(det)
-    ilat, ilon = arcore._match(lat, dlat), arcore._match(lon, dlon)
-    site_masks = {s["name"]: arcore.site_mask(s, dlat, dlon) for s in cfg["sites"]}
+    det = Detectors(cfg, lat, lon)
+    algos = det.available
 
     ev_dir = out_root / ev["id"]
     if ev_dir.exists():
@@ -114,47 +99,39 @@ def build(cfg: dict, ev: dict, thresholds: xr.Dataset, out_root: Path, workers: 
         t = dt.datetime.fromtimestamp(int(t.astype("datetime64[s]").astype(int)), dt.timezone.utc).replace(tzinfo=None)
         f = {k: ds[k].isel(time=i).values.astype(np.float32) for k in VARS}
         f["msl"] = f["msl"] / 100.0
-        pol = arcore.poleward(f["vivt"][ilat][:, ilon])
-        thr = thresholds["threshold"].sel(month=t.month).values
-        ar = arcore.detect_ar(pol, thr, dlat, det["min_lat_extent"])
-        ar_sites = [n for n, m in site_masks.items() if ar[m].any()]
-        extra, ar_sites_iwv = {}, None
-        if thr_iwv is not None:
-            ar_iwv = arcore.detect_ar(f["iwv"][ilat][:, ilon], thr_iwv["threshold"].sel(month=t.month).values,
-                                      dlat, det["min_lat_extent"])
-            extra["ar_iwv"] = ar_iwv
-            ar_sites_iwv = [n for n, m in site_masks.items() if ar_iwv[m].any()]
+        masks = det.run(t, f)
+        hits = det.sites_hit(masks)
         npz = tmp / f"ev_{ev['id']}_{i:03d}.npz"
-        np.savez(npz, lat=lat, lon=lon, **f, ar=ar, ar_lat=dlat, ar_lon=dlon, **extra)
+        np.savez(npz, lat=lat, lon=lon, uivt=f["uivt"], vivt=f["vivt"], msl=f["msl"], sp=f["sp"],
+                 **det.npz_fields(masks))
         fname = f"{t:%Y%m%d_%H}.png"
         jobs.append(dict(
-            npz=str(npz), dpi=int(cfg["site"].get("dpi", 110)),
-            outputs={l: str(ev_dir / l / fname) for l in maprender.LANGS},
+            npz=str(npz), dpi=int(cfg["site"].get("dpi", 150)),
+            base={l: str(ev_dir / l / fname) for l in maprender.LANGS},
+            layers={a: {l: str(ev_dir / l / a / fname) for l in maprender.LANGS} for a in algos},
             subtitles={l: f"ERA5 · {maprender.fmt_time(t, l)}" for l in maprender.LANGS},
             credit="ERA5, Copernicus Climate Change Service",
             lat_north=float(cfg["site"]["plot_lat_north"]),
             quiver_every=int(cfg["site"].get("quiver_every", 8)),
-            sites=cfg["sites"], has_thr=True))
-        fr = dict(time=t.strftime("%Y-%m-%dT%H:%MZ"), file=fname, ar_sites=ar_sites)
-        if ar_sites_iwv is not None:
-            fr["ar_sites_iwv"] = ar_sites_iwv
-        frames.append(fr)
-        print(f"  {t:%Y-%m-%d %HZ}" + (f"  vIVT : {', '.join(ar_sites)}" if ar_sites else "")
-              + (f"  IWV : {', '.join(ar_sites_iwv)}" if ar_sites_iwv else ""), flush=True)
+            sites=cfg["sites"]))
+        frames.append(dict(time=t.strftime("%Y-%m-%dT%H:%MZ"), file=fname, ar=hits))
+        print(f"  {t:%Y-%m-%d %HZ}  " + "  ".join(f"{a}: {', '.join(h) or '-'}" for a, h in hits.items()), flush=True)
 
     with ProcessPoolExecutor(max_workers=workers) as pool:
         list(pool.map(maprender.render, jobs))
 
     gifs = {}
-    for l in maprender.LANGS:
-        gif = ev_dir / f"{ev['id']}_{l}.gif"
-        maprender.make_gif([str(ev_dir / l / fr["file"]) for fr in frames], str(gif), width=720)
-        gifs[l] = f"{ev['id']}/{gif.name}"
-        print(f"  GIF {l} : {gif.stat().st_size / 1e6:.1f} Mo", flush=True)
+    for a in algos:
+        for l in maprender.LANGS:
+            gif = ev_dir / f"{ev['id']}_{a}_{l}.gif"
+            maprender.make_gif([(str(ev_dir / l / fr["file"]), str(ev_dir / l / a / fr["file"])) for fr in frames],
+                               str(gif), width=600)
+            gifs.setdefault(a, {})[l] = f"{ev['id']}/{gif.name}"
+        print(f"  GIF {a} : {gif.stat().st_size / 1e6:.1f} Mo", flush=True)
 
     return dict(id=ev["id"], start=str(ev["start"]), end=str(ev["end"]), title=ev["title"],
                 description=ev["description"], reference=ev.get("reference"),
-                frames=frames, gif=gifs)
+                algorithms=algos, frames=frames, gif=gifs)
 
 
 def main(argv=None):
@@ -171,13 +148,6 @@ def main(argv=None):
             print(download(cfg, ev))
         return
 
-    thr_file = arcore.cfg_path(cfg, cfg["climatology"]["output"])
-    if not thr_file.exists():
-        sys.exit(f"Seuils absents ({thr_file}). Lancer d'abord build_climatology.py.")
-    thresholds = xr.load_dataset(thr_file)
-    thr_iwv_file = arcore.cfg_path(cfg, cfg["climatology"].get("output_iwv", "data/thresholds_iwv.nc"))
-    thr_iwv = xr.load_dataset(thr_iwv_file) if thr_iwv_file.exists() else None
-    print("Détection IWV :", "oui" if thr_iwv is not None else f"non ({thr_iwv_file.name} absent)")
 
     out_root = arcore.cfg_path(cfg, cfg["site"]["output_dir"]) / "events"
     out_root.mkdir(parents=True, exist_ok=True)
@@ -185,7 +155,7 @@ def main(argv=None):
     old = {e["id"]: e for e in json.loads(manifest_file.read_text())} if manifest_file.exists() else {}
     for ev in events:
         print(f"Événement {ev['id']} ({ev['start']} → {ev['end']})", flush=True)
-        old[ev["id"]] = build(cfg, ev, thresholds, out_root, int(cfg["site"].get("render_workers", 4)), thr_iwv)
+        old[ev["id"]] = build(cfg, ev, out_root, int(cfg["site"].get("render_workers", 4)))
     order = [e["id"] for e in cfg["events"]]
     manifest = [old[i] for i in order if i in old]
     manifest_file.write_text(json.dumps(manifest, indent=1, ensure_ascii=False))

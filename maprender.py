@@ -1,7 +1,9 @@
-"""Rendu des cartes polaires sud (IVT, MSLP, contours AR, sites) en français et en anglais.
+"""Rendu des cartes polaires sud : un fond (IVT, MSLP, sites, textes) et un calque transparent
+par algorithme de détection (contour AR + référence de l'algorithme).
 
-Une carte est dessinée une seule fois ; seuls les textes changent entre les langues.
-Les PNG sont réduits à une palette de 256 couleurs (2 à 3 fois plus légers).
+Fond et calques ont exactement la même taille et la même géométrie : le site les superpose
+et compose l'image téléchargée. Une carte est dessinée une seule fois ; seuls les textes
+changent entre les langues. Les PNG sont réduits à 256 couleurs.
 """
 from __future__ import annotations
 
@@ -12,22 +14,14 @@ from pathlib import Path
 
 import numpy as np
 
+from algos import ALGOS, legend_line
+
 LANGS = ("fr", "en")
 TEXT = {
     "fr": dict(title="IVT, pression au niveau de la mer et rivières atmosphériques",
-               ar="Contour cyan : rivière atmosphérique",
-               algo="Détection AR : Wille et al. (2021), JGR Atmospheres, doi:10.1029/2020JD033788 · vIVT > 98e percentile mensuel ERA5, ≥ 20° de latitude",
-               algo2="Détection AR : cyan = vIVT, Wille et al. (2021), doi:10.1029/2020JD033788 · vert = IWV, Wille et al. (2019), doi:10.1038/s41561-019-0460-1 · > 98e percentile mensuel ERA5, ≥ 20° lat.",
-               ar2="Contours : cyan = AR (vIVT), vert = AR (IWV)",
-               no_ar="Seuils ERA5 non disponibles : pas de détection d'AR",
-               isobars="Isobares 4 hPa, masquées si p$_s$ < 800 hPa · pointillés : limite de détection 85°S"),
+               isobars="Isobares 4 hPa, masquées si p$_s$ < 800 hPa"),
     "en": dict(title="IVT, mean sea-level pressure and atmospheric rivers",
-               ar="Cyan contour: atmospheric river",
-               algo="AR detection: Wille et al. (2021), JGR Atmospheres, doi:10.1029/2020JD033788 · vIVT > monthly ERA5 98th percentile, ≥ 20° latitude",
-               algo2="AR detection: cyan = vIVT, Wille et al. (2021), doi:10.1029/2020JD033788 · green = IWV, Wille et al. (2019), doi:10.1038/s41561-019-0460-1 · > monthly ERA5 98th pct, ≥ 20° lat.",
-               ar2="Contours: cyan = AR (vIVT), green = AR (IWV)",
-               no_ar="ERA5 thresholds not available: no AR detection",
-               isobars="Isobars every 4 hPa, masked where p$_s$ < 800 hPa · dashed: 85°S detection limit"),
+               isobars="Isobars every 4 hPa, masked where p$_s$ < 800 hPa"),
 }
 DAYS = {"fr": ["lun.", "mar.", "mer.", "jeu.", "ven.", "sam.", "dim."],
         "en": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]}
@@ -42,11 +36,25 @@ def fmt_time(t: dt.datetime, lang: str, weekday: bool = True) -> str:
     return f"{wd}{t.day} {MONTHS_EN[t.month - 1]} {t.year} {t:%H} UTC"
 
 
-def render(job: dict) -> list[str]:
-    """Dessine une carte et l'enregistre dans chaque langue.
+def _save(fig, dpi, out, transparent=False):
+    from PIL import Image
 
-    job : npz (champs lat, lon, uivt, vivt, msl [hPa], sp [Pa], et facultativement ar, ar_lat, ar_lon),
-          outputs {lang: chemin png}, subtitles {lang: texte}, credit, sites, has_thr,
+    buf = io.BytesIO()
+    fig.savefig(buf, dpi=dpi, format="png", transparent=transparent)
+    buf.seek(0)
+    img = Image.open(buf)
+    Path(out).parent.mkdir(parents=True, exist_ok=True)
+    if transparent:
+        img.convert("RGBA").quantize(colors=64, method=Image.Quantize.FASTOCTREE).save(out, optimize=True)
+    else:
+        img.convert("RGB").quantize(colors=256, method=Image.Quantize.MEDIANCUT).save(out, optimize=True)
+
+
+def render(job: dict) -> list[str]:
+    """Dessine le fond et les calques d'une carte, dans chaque langue.
+
+    job : npz (lat, lon, uivt, vivt, msl [hPa], sp [Pa] ; masques AR <algo> et <algo>_lat/<algo>_lon),
+          base {lang: png}, layers {algo: {lang: png}}, subtitles {lang: texte}, credit, sites,
           lat_north, dpi, quiver_every.
     Exécuté dans un processus séparé (matplotlib n'est pas thread-safe).
     """
@@ -57,7 +65,6 @@ def render(job: dict) -> list[str]:
     import matplotlib.path as mpath
     import matplotlib.pyplot as plt
     from matplotlib.colors import BoundaryNorm, ListedColormap
-    from PIL import Image
     import cartopy.crs as ccrs
     import cartopy.feature as cfeature
     from cartopy.util import add_cyclic_point
@@ -68,7 +75,7 @@ def render(job: dict) -> list[str]:
     dpi = int(job.get("dpi", 150))
 
     fig = plt.figure(figsize=(8, 8.6), dpi=dpi)
-    ax = fig.add_axes([0.02, 0.135, 0.96, 0.805], projection=ccrs.SouthPolarStereo())
+    ax = fig.add_axes([0.02, 0.15, 0.96, 0.79], projection=ccrs.SouthPolarStereo())
     ax.set_extent([-180, 180, -90, job["lat_north"]], ccrs.PlateCarree())
     theta = np.linspace(0, 2 * np.pi, 200)
     circle = mpath.Path(np.vstack([np.sin(theta), np.cos(theta)]).T * 0.5 + 0.5)
@@ -90,7 +97,8 @@ def render(job: dict) -> list[str]:
     ax.coastlines("50m", linewidth=0.6, color="#3a3a3a")
 
     # isobares (masquées sur le haut plateau, où la réduction au niveau de la mer n'a pas de sens)
-    msl = np.where(d["sp"] < 80000.0, np.nan, d["msl"])
+    # et hors du cadre : sinon les étiquettes des isobares débordent du cercle
+    msl = np.where((d["sp"] < 80000.0) | (lat[:, None] > job["lat_north"]), np.nan, d["msl"])
     msl_c, _ = add_cyclic_point(msl, coord=lon)
     cs = ax.contour(X, Y, msl_c, levels=np.arange(920, 1060, 4), colors="#1f1f1f",
                     linewidths=0.6, transform=pc)
@@ -99,34 +107,11 @@ def render(job: dict) -> list[str]:
     # vecteurs IVT là où le transport est significatif
     step = int(job.get("quiver_every", 8))
     sl = (slice(None, None, step), slice(None, None, step))
-    show = ivt[sl] >= 250
+    show = (ivt[sl] >= 250) & (lat[sl[0]][:, None] <= job["lat_north"])
     if show.any():
         lon2, lat2 = np.meshgrid(lon[sl[1]], lat[sl[0]])
         ax.quiver(lon2[show], lat2[show], d["uivt"][sl][show], d["vivt"][sl][show], transform=pc,
                   scale=12000, width=0.0018, color="#202020", alpha=0.75)
-
-    def ar_contour(mask, color, z):
-        """Contour fermé d'un masque AR, couleur vive cerclée de noir."""
-        m = mask.astype(float)
-        ml = d["ar_lat"]
-        dl = ml[1] - ml[0]
-        m = np.vstack([np.zeros((1, m.shape[1])), m, np.zeros((1, m.shape[1]))])
-        ml = np.concatenate([[ml[0] - dl], ml, [ml[-1] + dl]])
-        mc, lc = add_cyclic_point(m, coord=d["ar_lon"])
-        XM, YM = np.meshgrid(lc, ml)
-        cs_m = ax.contour(XM, YM, mc, levels=[0.5], colors=color, linewidths=2.4, transform=pc, zorder=z)
-        cs_m.set(path_effects=[patheffects.withStroke(linewidth=4.8, foreground="#0f1e2e")])
-
-    has_iwv = "ar_iwv" in d.files
-    if has_iwv and d["ar_iwv"].any():
-        ar_contour(d["ar_iwv"], "#76ff03", 8)      # IWV en dessous, vert
-    if "ar" in d.files and d["ar"].any():
-        ar_contour(d["ar"], "#00e5ff", 9)          # vIVT au-dessus, cyan
-    if job.get("has_thr"):
-        # limite sud de la détection (85°S) : les AR y sont coupés
-        ring = np.linspace(0, 360, 361)
-        ax.plot(ring, np.full_like(ring, -85.0), transform=pc, color="#3a3a3a", lw=0.9,
-                ls=(0, (4, 3)), zorder=7)
 
     halo = [patheffects.withStroke(linewidth=3, foreground="white")]
     for s in job["sites"]:
@@ -138,42 +123,79 @@ def render(job: dict) -> list[str]:
     gl = ax.gridlines(pc, linewidth=0.3, color="#888888", alpha=0.6, linestyle="--")
     gl.ylocator = matplotlib.ticker.FixedLocator([-80, -70, -60, -50, -40, -30])
 
-    cax = fig.add_axes([0.15, 0.088, 0.7, 0.016])
+    cax = fig.add_axes([0.15, 0.104, 0.7, 0.016])
     cb = fig.colorbar(cf, cax=cax, orientation="horizontal", ticks=levels)
     cb.set_label("IVT (kg m$^{-1}$ s$^{-1}$)", fontsize=8)
     cb.ax.tick_params(labelsize=7)
 
     t_title = fig.text(0.03, 0.965, "", fontsize=10.5, weight="bold")
     t_sub = fig.text(0.03, 0.945, "", fontsize=8.5, color="#333333")
-    t_algo = fig.text(0.03, 0.026, "", fontsize=6.5, color="#222222")
     t_note = fig.text(0.03, 0.010, "", fontsize=6.5, color="#444444")
     written = []
-    for lang, out in job["outputs"].items():
-        tx = TEXT[lang]
-        t_title.set_text(tx["title"])
+    for lang, out in job["base"].items():
+        t_title.set_text(TEXT[lang]["title"])
         t_sub.set_text(job["subtitles"][lang])
-        t_algo.set_text((tx["algo2"] if has_iwv else tx["algo"]) if job["has_thr"] else tx["no_ar"])
-        ar_txt = tx["ar2"] if has_iwv else tx["ar"]
-        t_note.set_text(" · ".join(([ar_txt] if job["has_thr"] else []) + [tx["isobars"], job["credit"]]))
-        buf = io.BytesIO()
-        fig.savefig(buf, dpi=dpi, format="png")
-        buf.seek(0)
-        img = Image.open(buf).convert("RGB").quantize(colors=256, method=Image.Quantize.MEDIANCUT)
-        Path(out).parent.mkdir(parents=True, exist_ok=True)
-        img.save(out, optimize=True)
+        t_note.set_text(" · ".join([TEXT[lang]["isobars"], job["credit"]]))
+        _save(fig, dpi, out)
         written.append(out)
+
+    # ---- calques : on masque tout le fond, on garde la géométrie des axes
+    for a in list(ax.get_children()) + [cax, t_title, t_sub, t_note]:
+        if a is not ax.patch:
+            a.set_visible(False)
+    for sp in ax.spines.values():
+        sp.set_visible(False)
+    gl.xlines = gl.ylines = False
+    ax.patch.set_visible(False)
+    fig.patch.set_alpha(0)
+
+    def contour(mask, mlat, mlon, color):
+        """Contour fermé : le masque est bordé de zéros pour se refermer aux bords du domaine."""
+        m = mask.astype(float)
+        dl = mlat[1] - mlat[0]
+        m = np.vstack([np.zeros((1, m.shape[1])), m, np.zeros((1, m.shape[1]))])
+        ml = np.concatenate([[mlat[0] - dl], mlat, [mlat[-1] + dl]])
+        mc, lc = add_cyclic_point(m, coord=mlon)
+        XM, YM = np.meshgrid(lc, ml)
+        c = ax.contour(XM, YM, mc, levels=[0.5], colors=color, linewidths=2.4, transform=pc, zorder=9)
+        c.set(path_effects=[patheffects.withStroke(linewidth=4.8, foreground="#0f1e2e")])
+        return c
+
+    for algo, outs in job["layers"].items():
+        a = ALGOS[algo]
+        drawn = []
+        if algo in d.files and d[algo].any():
+            drawn.append(contour(d[algo], d[f"{algo}_lat"], d[f"{algo}_lon"], a["color"]))
+        if a["ring85"]:
+            ring = np.linspace(0, 360, 361)
+            drawn += ax.plot(ring, np.full_like(ring, -85.0), transform=pc, color="#3a3a3a", lw=0.9,
+                             ls=(0, (4, 3)), zorder=7)
+        t_ref = fig.text(0.03, 0.042, "", fontsize=6.5, color="#222222")
+        t_leg = fig.text(0.03, 0.026, "", fontsize=6.5, color="#444444")
+        drawn += [t_ref, t_leg]
+        for lang, out in outs.items():
+            t_ref.set_text(a["ref"][lang])
+            t_leg.set_text(legend_line(algo, lang))
+            _save(fig, dpi, out, transparent=True)
+            written.append(out)
+        for art in drawn:
+            art.remove()
+
     plt.close(fig)
     Path(job["npz"]).unlink()
     return written
 
 
-def make_gif(frames: list[str], out: str, width: int = 640, ms: int = 450) -> None:
-    """Animation GIF à partir des PNG (réduits à `width` pixels de large)."""
+def make_gif(frames: list[tuple[str, str | None]], out: str, width: int = 640, ms: int = 450) -> None:
+    """Animation GIF à partir de couples (fond, calque) superposés, réduits à `width` pixels."""
     from PIL import Image
 
     imgs = []
-    for f in frames:
-        im = Image.open(f).convert("RGB")
+    for base, layer in frames:
+        im = Image.open(base).convert("RGBA")
+        if layer:
+            im = Image.alpha_composite(im, Image.open(layer).convert("RGBA"))
+        im = im.convert("RGB")
         h = round(im.height * width / im.width)
         imgs.append(im.resize((width, h), Image.LANCZOS).quantize(colors=256, method=Image.Quantize.MEDIANCUT))
     durations = [ms] * len(imgs)

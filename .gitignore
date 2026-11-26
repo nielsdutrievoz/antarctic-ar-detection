@@ -2,6 +2,7 @@
 data/*
 !data/thresholds_vivt.nc
 !data/thresholds_iwv.nc
+!data/thresholds_dark.nc
 site/maps/
 site/data/
 __pycache__/

@@ -11,4 +11,6 @@ dependencies:
   - python-eccodes
   - matplotlib-base
   - cartopy
+  - scikit-image
+  - networkx
   - cdsapi

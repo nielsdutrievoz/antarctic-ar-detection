@@ -2,8 +2,8 @@
 """Cartes synoptiques Antarctique (ECMWF HRES open data) avec rivières atmosphériques.
 
 Pour chaque échéance du dernier run déterministe 00/12 UTC : IVT en couleur, vecteurs IVT,
-isobares (MSLP), contours des AR détectées (méthode de Wille, vIVT) et sites configurés.
-Écrit les PNG dans <site>/maps/ et un manifeste JSON lu par la page web.
+isobares (MSLP) et sites, plus un calque de contours AR par algorithme disponible
+(Wille vIVT, Wille IWV, DARK). Écrit les PNG dans <site>/maps/ et un manifeste JSON lu par la page web.
 
     python synoptic_maps.py                    # dernier run
     python synoptic_maps.py --date 2026-11-25 --time 0
@@ -24,16 +24,18 @@ import xarray as xr
 import arcore
 import maprender
 import opendata
+from detectors import Detectors
 
 PARAMS_PL = ("q", "u", "v")
 PARAMS_SFC = ("sp", "msl", "tcwv")
 
 
 # --------------------------------------------------------------------------- données
-def plot_grid(cfg):
+def data_grid(cfg):
+    """Grille des données : de site.data_lat_north (15°S, domaine de DARK) au pôle."""
     s = cfg["site"]
     res = float(cfg["detection"]["grid_res"])
-    lat = np.round(np.arange(s["plot_lat_north"], -90 - res / 2, -res), 6)
+    lat = np.round(np.arange(s.get("data_lat_north", -15.0), -90 - res / 2, -res), 6)
     lon = np.round(np.arange(0.0, 360.0, res), 6)
     return lat, lon
 
@@ -72,7 +74,7 @@ def main(argv=None):
     args = ap.parse_args(argv)
 
     cfg = arcore.load_config(args.config)
-    sc, det = cfg["site"], cfg["detection"]
+    sc = cfg["site"]
     max_step = args.max_step if args.max_step is not None else int(sc["max_step_h"])
     steps = list(range(0, max_step + 1, int(sc["step_interval_h"])))
     if args.date:
@@ -88,79 +90,57 @@ def main(argv=None):
     tmp = arcore.cfg_path(cfg, cfg["forecast"]["work_dir"])
     tmp.mkdir(parents=True, exist_ok=True)
 
-    lat, lon = plot_grid(cfg)
-    dlat, dlon = arcore.target_grid(det)
-    ilat = arcore._match(lat, dlat)
-    thr_file = arcore.cfg_path(cfg, cfg["climatology"]["output"])
-    thresholds = None
-    if thr_file.exists():
-        thresholds = xr.load_dataset(thr_file)
-        if thresholds.attrs.get("variable", "vivt") != "vivt":
-            print(f"{thr_file.name} n'est pas un fichier de seuils vIVT : détection désactivée.")
-            thresholds = None
-    else:
-        print(f"Seuils absents ({thr_file}) : cartes sans détection d'AR.")
-    thr_iwv_file = arcore.cfg_path(cfg, cfg["climatology"].get("output_iwv", "data/thresholds_iwv.nc"))
-    thr_iwv = xr.load_dataset(thr_iwv_file) if (thresholds is not None and thr_iwv_file.exists()) else None
+    lat, lon = data_grid(cfg)
+    det = Detectors(cfg, lat, lon)
+    algos = det.available
+    print("Algorithmes :", ", ".join(algos) or "aucun (seuils absents)")
     levels = [int(x) for x in cfg["forecast"]["levels"]]
-    site_masks = {s["name"]: arcore.site_mask(s, dlat, dlon) for s in cfg["sites"]}
 
     print(f"Run HRES {base:%Y-%m-%d %HZ}, {len(steps)} échéances", flush=True)
     frames, futures = [], []
+    run_fr, run_en = (maprender.fmt_time(base, l, weekday=False) for l in ("fr", "en"))
     with ProcessPoolExecutor(max_workers=int(sc.get("render_workers", 4))) as pool:
         for step in steps:
             t0 = time.time()
             vt = base + dt.timedelta(hours=step)
             fl = load_step(cfg, base, step, lat, lon, levels)
-            extra, ar_sites = {}, []
-            if thresholds is not None:
-                pol = arcore.poleward(fl["vivt"][ilat])
-                thr = thresholds["threshold"].sel(month=vt.month).values
-                ar = arcore.detect_ar(pol, thr, dlat, det["min_lat_extent"])
-                extra = dict(ar=ar, ar_lat=dlat, ar_lon=dlon)
-                ar_sites = [n for n, m in site_masks.items() if ar[m].any()]
-            ar_sites_iwv = None
-            if thr_iwv is not None:
-                ar_iwv = arcore.detect_ar(fl["iwv"][ilat], thr_iwv["threshold"].sel(month=vt.month).values,
-                                          dlat, det["min_lat_extent"])
-                extra["ar_iwv"] = ar_iwv
-                ar_sites_iwv = [n for n, m in site_masks.items() if ar_iwv[m].any()]
+            masks = det.run(vt, fl)
+            hits = det.sites_hit(masks)
             npz = tmp / f"frame_{step:03d}.npz"
-            np.savez(npz, lat=lat, lon=lon, **fl, **extra)
-            fname = f"syn_{step:03d}.png"
-            fr_, en_ = (maprender.fmt_time(base, l, weekday=False) for l in ("fr", "en"))
-            job = dict(npz=str(npz), dpi=int(sc.get("dpi", 110)),
-                       outputs={l: str(maps / l / fname) for l in maprender.LANGS},
-                       subtitles={"fr": f"ECMWF HRES · run {fr_} · +{step} h · valide {maprender.fmt_time(vt, 'fr')}",
-                                  "en": f"ECMWF HRES · run {en_} · +{step} h · valid {maprender.fmt_time(vt, 'en')}"},
+            np.savez(npz, lat=lat, lon=lon, uivt=fl["uivt"], vivt=fl["vivt"], msl=fl["msl"], sp=fl["sp"],
+                     **det.npz_fields(masks))
+            stem = f"syn_{step:03d}"
+            job = dict(npz=str(npz), dpi=int(sc.get("dpi", 150)),
+                       base={l: str(maps / l / f"{stem}.png") for l in maprender.LANGS},
+                       layers={a: {l: str(maps / l / a / f"{stem}.png") for l in maprender.LANGS} for a in algos},
+                       subtitles={"fr": f"ECMWF HRES · run {run_fr} · +{step} h · valide {maprender.fmt_time(vt, 'fr')}",
+                                  "en": f"ECMWF HRES · run {run_en} · +{step} h · valid {maprender.fmt_time(vt, 'en')}"},
                        credit="ECMWF open data, CC-BY-4.0",
                        lat_north=float(sc["plot_lat_north"]), quiver_every=int(sc.get("quiver_every", 8)),
-                       sites=cfg["sites"], has_thr=thresholds is not None)
+                       sites=cfg["sites"])
             futures.append(pool.submit(maprender.render, job))
-            frame = dict(step=step, valid=vt.strftime("%Y-%m-%dT%H:%MZ"), file=fname, ar_sites=ar_sites)
-            if ar_sites_iwv is not None:
-                frame["ar_sites_iwv"] = ar_sites_iwv
-            frames.append(frame)
-            print(f"  +{step:3d}h {vt:%d/%m %HZ} ({time.time() - t0:4.1f}s)"
-                  + (f"  AR : {', '.join(ar_sites)}" if ar_sites else ""), flush=True)
+            frames.append(dict(step=step, valid=vt.strftime("%Y-%m-%dT%H:%MZ"), file=f"{stem}.png", ar=hits))
+            print(f"  +{step:3d}h {vt:%d/%m %HZ} ({time.time() - t0:4.1f}s)  "
+                  + "  ".join(f"{a}: {', '.join(h) or '-'}" for a, h in hits.items()), flush=True)
         for f in futures:
             f.result()
 
-    # animation GIF de toute la prévision, une par langue
+    # animation GIF de toute la prévision : une par langue et par algorithme
     gifs = {}
-    for lang in maprender.LANGS:
-        name = f"ar_forecast_{base:%Y%m%d%H}_{lang}.gif"
-        maprender.make_gif([str(maps / lang / fr["file"]) for fr in frames], str(maps / lang / name), width=720)
-        gifs[lang] = f"maps/{lang}/{name}"
-        print(f"GIF {lang} : {(maps / lang / name).stat().st_size / 1e6:.1f} Mo")
+    for a in algos or [None]:
+        for lang in maprender.LANGS:
+            name = f"ar_forecast_{base:%Y%m%d%H}_{a or 'base'}_{lang}.gif"
+            maprender.make_gif([(str(maps / lang / fr["file"]), str(maps / lang / a / fr["file"]) if a else None)
+                                for fr in frames], str(maps / lang / name), width=720)
+            gifs.setdefault(a or "base", {})[lang] = f"maps/{lang}/{name}"
+    print("GIF :", sum(len(v) for v in gifs.values()))
 
     manifest = dict(
         run=base.strftime("%Y-%m-%dT%HZ"),
         generated=dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%MZ"),
         model="ECMWF IFS HRES 0.25° (open data)",
         period=f"{cfg['climatology']['first_year']}-{cfg['climatology']['last_year']}",
-        detection=thresholds is not None,
-        detection_iwv=thr_iwv is not None,
+        algorithms=algos,
         sites=[dict(name=s["name"], lat=s["lat"], lon=s["lon"]) for s in cfg["sites"]],
         frames=frames,
         gif=gifs,
