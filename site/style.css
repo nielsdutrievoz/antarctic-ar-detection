@@ -273,3 +273,6 @@ ul.small { font-size: .93rem; }
 }
 .places button:hover { background: rgba(15, 30, 46, .1); }
 .pin.preview { background: rgba(255, 255, 255, .85); border-color: #e53935; box-shadow: 0 0 0 1.5px #0f1e2e; }
+/* plus spécifique que .panel ul / .panel li */
+#alert-form .places { margin: 14px 0 0; padding: 0; gap: 8px 10px; }
+#alert-form .places li { margin: 0; }
