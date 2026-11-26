@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&display=swap">
-  <link rel="stylesheet" href="style.css?v=20261126d">
+  <link rel="stylesheet" href="style.css?v=20261126e">
 </head>
 <body>
   <header class="topbar">
@@ -302,10 +302,23 @@
     </aside>
   </main>
 
+  <div class="zoom" id="zoom" hidden role="dialog" aria-modal="true">
+    <div class="zoom-bar">
+      <span id="zoom-label"></span>
+      <button class="zoom-btn" id="zoom-close" type="button" aria-label="Fermer">✕</button>
+    </div>
+    <figure class="zoomstack" id="zoomstack">
+      <img id="zoom-map" alt="">
+      <img id="zoom-layer" alt="" aria-hidden="true" hidden>
+    </figure>
+    <button class="zoom-btn zoom-nav prev" id="zoom-prev" type="button" aria-label="Précédente">‹</button>
+    <button class="zoom-btn zoom-nav next" id="zoom-next" type="button" aria-label="Suivante">›</button>
+  </div>
+
   <footer class="site-footer">
     <p data-i18n-html="footer"></p>
   </footer>
 
-  <script src="app.js?v=20261126d"></script>
+  <script src="app.js?v=20261126e"></script>
 </body>
 </html>

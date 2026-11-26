@@ -276,3 +276,31 @@ ul.small { font-size: .93rem; }
 /* plus spécifique que .panel ul / .panel li */
 #alert-form .places { margin: 14px 0 0; padding: 0; gap: 8px 10px; }
 #alert-form .places li { margin: 0; }
+
+/* ---------------------------------------------------------------- carte en grand */
+.mapstack { cursor: zoom-in; }
+.zoom {
+  position: fixed; inset: 0; z-index: 100; background: rgba(8, 16, 26, .94);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 8px 12px;
+}
+.zoom[hidden] { display: none; }
+.zoom-bar {
+  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  color: #fff; font-family: var(--head); font-size: .9rem; padding: 0 6px 8px;
+}
+.zoomstack {
+  position: relative; margin: 0; cursor: zoom-out;
+  width: min(100%, calc((100vh - 80px) * 1200 / 1290)); width: min(100%, calc((100dvh - 80px) * 1200 / 1290));
+}
+.zoomstack img { display: block; width: 100%; height: auto; border-radius: 8px; background: #fff; }
+.zoomstack #zoom-layer { position: absolute; inset: 0; background: transparent; }
+.zoom-btn {
+  width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, .35);
+  background: rgba(255, 255, 255, .12); color: #fff; font-size: 1.3rem; line-height: 1; cursor: pointer;
+}
+.zoom-btn:hover { background: rgba(255, 255, 255, .25); }
+.zoom-nav { position: absolute; top: 50%; transform: translateY(-50%); font-size: 1.9rem; }
+.zoom-nav.prev { left: 12px; }
+.zoom-nav.next { right: 12px; }
+@media (max-width: 700px) { .zoom-nav { top: auto; bottom: 14px; transform: none; } }
+body.zoom-open { overflow: hidden; }

@@ -89,7 +89,8 @@ const I18N = {
     no_ar: "pas d'AR",
     ar_from: (s) => `AR dès ${s}`,
     ar: "AR",
-    play: "Lecture", pause: "Pause", prev: "Précédente", next: "Suivante",
+    play: "Lecture", pause: "Pause", prev: "Précédente", next: "Suivante", close: "Fermer",
+    enlarge: "Cliquer pour agrandir",
     map_alt: "Carte : IVT, pression au niveau de la mer et rivières atmosphériques",
     reference: "Référence :",
   },
@@ -180,7 +181,8 @@ const I18N = {
     no_ar: "no AR",
     ar_from: (s) => `AR from ${s}`,
     ar: "AR",
-    play: "Play", pause: "Pause", prev: "Previous", next: "Next",
+    play: "Play", pause: "Pause", prev: "Previous", next: "Next", close: "Close",
+    enlarge: "Click to enlarge",
     map_alt: "Map: IVT, mean sea-level pressure and atmospheric rivers",
     reference: "Reference:",
   },
@@ -228,11 +230,19 @@ async function init() {
   }));
   document.addEventListener("keydown", (e) => {
     if (["INPUT", "SELECT", "TEXTAREA"].includes(e.target.tagName) && e.target.type !== "range") return;
+    if (e.key === "Escape" && !$("zoom").hidden) { closeZoom(); return; }
     if (e.key === "ArrowLeft") { show(state.current - 1); e.preventDefault(); }
     if (e.key === "ArrowRight") { show(state.current + 1); e.preventDefault(); }
     if (e.key === " " && e.target.tagName !== "BUTTON") { toggle(); e.preventDefault(); }
   });
   window.addEventListener("hashchange", () => { readUrl(); render(); });
+  // carte en grand
+  document.querySelector(".mapstack").onclick = openZoom;
+  $("zoom-close").onclick = closeZoom;
+  $("zoomstack").onclick = closeZoom;
+  $("zoom").onclick = (e) => { if (e.target === $("zoom")) closeZoom(); };
+  $("zoom-prev").onclick = (e) => { e.stopPropagation(); show(state.current - 1); };
+  $("zoom-next").onclick = (e) => { e.stopPropagation(); show(state.current + 1); };
   render();
   handleAlertLink();
 }
@@ -283,6 +293,10 @@ function render() {
   document.querySelectorAll("[data-tab]").forEach((b) => b.setAttribute("aria-selected", b.dataset.tab === state.tab));
   document.querySelector('[data-tab="alert"]').hidden = !ALERT_ENABLED;
   $("prev").setAttribute("aria-label", L.prev);
+  $("zoom-prev").setAttribute("aria-label", L.prev);
+  $("zoom-next").setAttribute("aria-label", L.next);
+  $("zoom-close").setAttribute("aria-label", L.close);
+  document.querySelector(".mapstack").title = L.enlarge;
   $("next").setAttribute("aria-label", L.next);
   $("map").alt = L.map_alt;
   $("home-link").href = L.home;
@@ -486,6 +500,30 @@ function show(i) {
   $("label").textContent = f.label;
   $("dl-image").href = f.url;
   document.querySelectorAll(".strip button").forEach((b) => b.classList.toggle("current", +b.dataset.i === state.current));
+  if (!$("zoom").hidden) syncZoom();
+}
+
+/* ------------------------------------------------------------------ carte en grand */
+function syncZoom() {
+  const f = view.frames[state.current];
+  if (!f) return;
+  $("zoom-map").src = f.url;
+  $("zoom-map").alt = $("map").alt;
+  $("zoom-layer").hidden = !f.layer;
+  if (f.layer) $("zoom-layer").src = f.layer;
+  $("zoom-label").textContent = f.label;
+}
+function openZoom() {
+  if (!view.frames.length) return;
+  $("zoom").hidden = false;
+  document.body.classList.add("zoom-open");
+  syncZoom();
+  $("zoom-close").focus();
+}
+function closeZoom() {
+  $("zoom").hidden = true;
+  document.body.classList.remove("zoom-open");
+  document.querySelector(".mapstack").focus?.();
 }
 
 function toggle() { state.timer ? stop() : start(); }
