@@ -154,3 +154,14 @@ figure { margin: 0; }
 .site-footer p { margin: 0; font-family: var(--head); font-size: .72rem; letter-spacing: .06em; }
 .site-footer a { color: var(--muted); }
 .info { margin: 0 0 12px; }
+
+/* onglet Méthode */
+.method { display: grid; gap: 22px; margin-top: -50px; position: relative; max-width: 900px; }
+.method[hidden], .layout[hidden], .prose[hidden] { display: none; }
+.prose h2 { font-family: var(--head); font-weight: 400; font-size: 1.5rem; letter-spacing: -.02em; line-height: 1.25; margin: 0 0 16px; }
+.prose h3 { font-family: var(--head); font-weight: 400; font-size: 1.12rem; letter-spacing: -.01em; margin: 26px 0 8px; }
+.prose p { margin: 0 0 14px; }
+.prose ul, .prose ol { padding-left: 1.2em; margin: 0 0 14px; }
+.prose li { margin-bottom: 6px; }
+.prose li::marker { color: var(--accent); }
+.refs ol li { font-size: .92rem; }

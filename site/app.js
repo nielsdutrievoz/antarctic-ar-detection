@@ -15,6 +15,9 @@ const I18N = {
     footer: "Niels Dutrievoz · Données ECMWF (CC-BY-4.0) et Copernicus ERA5 · <a href=\"https://github.com/nielsdutrievoz/antarctic-ar-detection\">Code source</a>",
     tab_forecast: "Prévision",
     tab_events: "Événements passés",
+    tab_method: "Méthode",
+    refs_label: "Références",
+    method_more: "Méthode détaillée, références et catalogue →",
     download_image: "Télécharger l'image",
     download_gif: "Télécharger l'animation (GIF)",
     sites_title: "AR aux sites",
@@ -51,6 +54,9 @@ const I18N = {
     footer: "Niels Dutrievoz · Data: ECMWF (CC-BY-4.0) and Copernicus ERA5 · <a href=\"https://github.com/nielsdutrievoz/antarctic-ar-detection\">Source code</a>",
     tab_forecast: "Forecast",
     tab_events: "Past events",
+    tab_method: "Method",
+    refs_label: "References",
+    method_more: "Detailed method, references and catalogue →",
     download_image: "Download image",
     download_gif: "Download animation (GIF)",
     sites_title: "ARs at sites",
@@ -102,6 +108,9 @@ async function init() {
   $("prev").onclick = () => show(state.current - 1);
   $("next").onclick = () => show(state.current + 1);
   $("play").onclick = toggle;
+  document.querySelectorAll("[data-goto]").forEach((a) => (a.onclick = (e) => {
+    e.preventDefault(); state.tab = a.dataset.goto; stop(); save(); render(); window.scrollTo({ top: 0, behavior: "smooth" });
+  }));
   document.addEventListener("keydown", (e) => {
     if (["INPUT", "SELECT", "TEXTAREA"].includes(e.target.tagName) && e.target.type !== "range") return;
     if (e.key === "ArrowLeft") { show(state.current - 1); e.preventDefault(); }
@@ -127,7 +136,7 @@ function readUrl() {
   const nav = (navigator.language || "fr").toLowerCase().startsWith("fr") ? "fr" : "en";
   state.lang = ["fr", "en"].includes(q) ? q : (stored || nav);
   const [tab, id] = location.hash.replace(/^#/, "").split("/");
-  state.tab = tab === "events" ? "events" : "forecast";
+  state.tab = ["events", "method"].includes(tab) ? tab : "forecast";
   if (id) state.eventId = decodeURIComponent(id);
 }
 
@@ -155,6 +164,11 @@ function render() {
   $("back-link").href = L.home;
   $("method").textContent = forecast && forecast.detection ? L.detection_on(forecast.period) : (forecast ? L.detection_off : "");
 
+  document.querySelectorAll("[data-only]").forEach((el) => (el.hidden = el.dataset.only !== state.lang));
+  const isMethod = state.tab === "method";
+  $("maps-page").hidden = isMethod;
+  $("method-page").hidden = !isMethod;
+  if (isMethod) { stop(); return; }
   if (state.tab === "forecast") renderForecast(); else renderEvents();
   setPlayLabel();
 }

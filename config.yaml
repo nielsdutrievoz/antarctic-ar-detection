@@ -92,6 +92,18 @@ events:
     reference:
       text: "Dutrievoz et al. (2026), The Cryosphere 20, 1025–1046"
       url: "https://doi.org/10.5194/tc-20-1025-2026"
+  - id: 2022-02-peninsula
+    start: 2022-02-04
+    end: 2022-02-11
+    title:
+      fr: "Février 2022 : AR intense et records de chaleur sur la Péninsule"
+      en: "February 2022: intense AR and record heat on the Peninsula"
+    description:
+      fr: "Rivière atmosphérique intense guidée vers la Péninsule antarctique par une dépression de la mer d'Amundsen anormale et un anticyclone record à l'est de la Péninsule. Les 7 et 8 février 2022, records absolus de température à King Sejong (13,7 °C), Carlini (13,6 °C), Vernadsky (12,7 °C) et Palmer (11,6 °C), avec une fonte de surface record."
+      en: "Intense atmospheric river steered towards the Antarctic Peninsula by an anomalous Amundsen Sea Low and a record-breaking high-pressure system east of the Peninsula. On 7–8 February 2022, all-time temperature records at King Sejong (13.7 °C), Carlini (13.6 °C), Vernadsky (12.7 °C) and Palmer (11.6 °C), with record surface melt."
+    reference:
+      text: "Gorodetskaya et al. (2023), npj Climate and Atmospheric Science 6, 202"
+      url: "https://doi.org/10.1038/s41612-023-00529-6"
   - id: 2022-03-east-antarctica
     start: 2022-03-13
     end: 2022-03-21
@@ -102,5 +114,5 @@ events:
       fr: "Rivière atmosphérique issue du secteur de l'océan Indien (15–19 mars 2022), à l'origine de la vague de chaleur record sur le plateau de l'Antarctique de l'Est, avec des températures exceptionnelles à Concordia le 18 mars."
       en: "Atmospheric river from the Indian Ocean sector (15–19 March 2022) that drove the record-breaking heatwave over the East Antarctic plateau, with exceptional temperatures at Concordia on 18 March."
     reference:
-      text: "Wille et al. (2024), Journal of Climate"
-      url: ""
+      text: "Wille et al. (2024), Journal of Climate 37, 757–778"
+      url: "https://doi.org/10.1175/JCLI-D-23-0175.1"

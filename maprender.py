@@ -15,11 +15,13 @@ import numpy as np
 LANGS = ("fr", "en")
 TEXT = {
     "fr": dict(title="IVT, pression au niveau de la mer et rivières atmosphériques",
-               ar="Contour magenta : AR (Wille et al. 2021)",
+               ar="Contour magenta : rivière atmosphérique",
+               algo="Détection AR : Wille et al. (2021), J. Geophys. Res. Atmos. 126, e2020JD033788, doi:10.1029/2020JD033788 (vIVT > 98e percentile mensuel ERA5, ≥ 20° de latitude)",
                no_ar="Seuils ERA5 non disponibles : pas de détection d'AR",
                isobars="Isobares 4 hPa, masquées si p$_s$ < 800 hPa"),
     "en": dict(title="IVT, mean sea-level pressure and atmospheric rivers",
-               ar="Magenta contour: AR (Wille et al. 2021)",
+               ar="Magenta contour: atmospheric river",
+               algo="AR detection: Wille et al. (2021), J. Geophys. Res. Atmos. 126, e2020JD033788, doi:10.1029/2020JD033788 (vIVT > monthly ERA5 98th percentile, ≥ 20° latitude)",
                no_ar="ERA5 thresholds not available: no AR detection",
                isobars="Isobars every 4 hPa, masked where p$_s$ < 800 hPa"),
 }
@@ -61,7 +63,7 @@ def render(job: dict) -> list[str]:
     dpi = int(job.get("dpi", 110))
 
     fig = plt.figure(figsize=(8, 8.6), dpi=dpi)
-    ax = fig.add_axes([0.02, 0.125, 0.96, 0.815], projection=ccrs.SouthPolarStereo())
+    ax = fig.add_axes([0.02, 0.135, 0.96, 0.805], projection=ccrs.SouthPolarStereo())
     ax.set_extent([-180, 180, -90, job["lat_north"]], ccrs.PlateCarree())
     theta = np.linspace(0, 2 * np.pi, 200)
     circle = mpath.Path(np.vstack([np.sin(theta), np.cos(theta)]).T * 0.5 + 0.5)
@@ -111,20 +113,22 @@ def render(job: dict) -> list[str]:
     gl = ax.gridlines(pc, linewidth=0.3, color="#888888", alpha=0.6, linestyle="--")
     gl.ylocator = matplotlib.ticker.FixedLocator([-80, -70, -60, -50, -40, -30])
 
-    cax = fig.add_axes([0.15, 0.075, 0.7, 0.016])
+    cax = fig.add_axes([0.15, 0.088, 0.7, 0.016])
     cb = fig.colorbar(cf, cax=cax, orientation="horizontal", ticks=levels)
     cb.set_label("IVT (kg m$^{-1}$ s$^{-1}$)", fontsize=8)
     cb.ax.tick_params(labelsize=7)
 
     t_title = fig.text(0.03, 0.965, "", fontsize=10.5, weight="bold")
     t_sub = fig.text(0.03, 0.945, "", fontsize=8.5, color="#333333")
-    t_note = fig.text(0.03, 0.012, "", fontsize=6.5, color="#444444")
+    t_algo = fig.text(0.03, 0.026, "", fontsize=6.5, color="#222222")
+    t_note = fig.text(0.03, 0.010, "", fontsize=6.5, color="#444444")
     written = []
     for lang, out in job["outputs"].items():
         tx = TEXT[lang]
         t_title.set_text(tx["title"])
         t_sub.set_text(job["subtitles"][lang])
-        t_note.set_text(" · ".join([tx["ar"] if job["has_thr"] else tx["no_ar"], tx["isobars"], job["credit"]]))
+        t_algo.set_text(tx["algo"] if job["has_thr"] else tx["no_ar"])
+        t_note.set_text(" · ".join(([tx["ar"]] if job["has_thr"] else []) + [tx["isobars"], job["credit"]]))
         buf = io.BytesIO()
         fig.savefig(buf, dpi=dpi, format="png")
         buf.seek(0)
