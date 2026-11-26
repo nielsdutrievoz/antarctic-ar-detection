@@ -414,27 +414,61 @@ def cmd_alerts(cfg: dict, args) -> None:
     print(f"{sent} alerte(s) envoyée(s)")
 
 
+# stations du formulaire du site, pour trouver un exemple d'AR réel (commande « test »)
+TEST_STATIONS = [
+    ("Concordia", -75.10, 123.35), ("Dumont d'Urville", -66.66, 140.00), ("Neumayer III", -70.67, -8.27),
+    ("Casey", -66.28, 110.53), ("Davis", -68.58, 77.97), ("Mawson", -67.60, 62.87), ("Syowa", -69.00, 39.58),
+    ("Princess Elisabeth", -71.95, 23.35), ("Halley VI", -75.58, -26.66), ("Rothera", -67.57, -68.13),
+    ("Vernadsky", -65.25, -64.26), ("Esperanza", -63.40, -56.98), ("McMurdo", -77.85, 166.67),
+    ("Mario Zucchelli", -74.69, 164.11), ("Vostok", -78.46, 106.84), ("Dome Fuji", -77.32, 39.70),
+    ("Kohnen", -75.00, 0.07), ("Byrd", -80.01, -119.40),
+]
+
+
 def cmd_test(cfg: dict, args) -> None:
-    """Exemple d'alerte pour vérifier l'envoi : Concordia, premier AR de la prévision ou fausse fenêtre."""
+    """Exemple d'alerte « [TEST] » : le lieu demandé si un AR y est prévu, sinon la première station
+    du site où la prévision en cours montre un AR, sinon un point d'un AR prévu."""
     import tempfile
 
     mc = cfg["alert_mail"]
     fc = Forecast(cfg)
-    sub = dict(id="test", token="00000000-0000-4000-8000-000000000000", email=args.to, lang=args.lang,
-               station=args.station, lat=args.lat, lon=args.lon, algorithms=list(fc.algos), alert_state={})
-    new, _ = new_events(fc, mc, sub)
-    if not new:                              # pas d'AR prévu : exemple fictif sur 24 h au milieu de la prévision
+    base = dict(id="test", token="00000000-0000-4000-8000-000000000000", email=args.to, lang=args.lang,
+                algorithms=list(fc.algos), alert_state={})
+    candidates = [(args.station, args.lat, args.lon)] + [x for x in TEST_STATIONS if x[0] != args.station]
+    sub, new = None, {}
+    for name, lat, lon in candidates:
+        sub = dict(base, station=name, lat=lat, lon=lon)
+        new, _ = new_events(fc, mc, sub)
+        if new:
+            break
+    if not new:
+        # aucun AR aux stations : un point au cœur d'un AR prévu, au sud de 60°S si possible
+        np = fc.np
+        for a in sorted(fc.algos, key=lambda a: a != "dark"):
+            glat, glon = fc.grid[a]
+            m = fc.masks[a]
+            south = m & (glat[None, :, None] <= -60)
+            pick = south if south.any() else m
+            if pick.any():
+                i, y, x = (int(v[len(v) // 2]) for v in np.nonzero(pick))
+                lon = float(glon[x]) - 360 if glon[x] > 180 else float(glon[x])
+                sub = dict(base, station=None, lat=float(glat[y]), lon=lon)
+                new, _ = new_events(fc, mc, sub)
+                if new:
+                    break
+    if not new:
+        sub = dict(base, station=args.station, lat=args.lat, lon=args.lon)
         mid = len(fc.valid) // 2
         new = {fc.algos[-1]: list(range(mid, min(mid + 5, len(fc.valid))))}
-        print("Aucun AR prévu à ce lieu : exemple avec une fenêtre fictive.")
+        print("Aucun AR dans toute la prévision : exemple avec une fenêtre fictive.")
+    print(f"Exemple pour {place_name(sub)} : {', '.join(new)}")
     mailer = Mailer(mc, args.dry_run)
     try:
         with tempfile.TemporaryDirectory() as tmp:
             mailer.send(alert_message(mailer, mc, fc, sub, new, Path(tmp), test=True))
-            mailer.send(confirmation_message(mailer, mc, [sub, dict(sub, station="Vostok", lat=-78.46, lon=106.84)]))
     finally:
         mailer.close()
-    print("Exemples envoyés (alerte + confirmation).")
+    print("Exemple d'alerte envoyé.")
 
 
 def main(argv=None):

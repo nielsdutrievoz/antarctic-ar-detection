@@ -1,0 +1,48 @@
+name: Tester un e-mail d'alerte
+
+# Envoie un exemple d'alerte « [TEST] » construit sur la prévision du moment : un lieu où un AR
+# est réellement prévu (station du site, sinon un point de l'AR). Lancement manuel uniquement.
+on:
+  workflow_dispatch:
+    inputs:
+      to:
+        description: "Adresse qui reçoit l'exemple"
+        required: true
+      lang:
+        description: "Langue"
+        type: choice
+        options: [fr, en]
+        default: fr
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-file: environment.yml
+          cache-environment: true
+
+      - name: Cache des traits de côte (Natural Earth)
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/cartopy
+          key: cartopy-naturalearth-v1
+
+      - name: Prévision du moment
+        shell: bash -el {0}
+        run: python -u synoptic_maps.py
+
+      - name: Envoyer l'exemple
+        shell: bash -el {0}
+        env:
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          TO: ${{ inputs.to }}
+          LANG_MAIL: ${{ inputs.lang }}
+        run: python -u alert_mail.py test --to "$TO" --lang "$LANG_MAIL"
