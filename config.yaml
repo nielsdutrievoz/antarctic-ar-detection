@@ -13,6 +13,10 @@ sites:
     lat: -75.10
     lon: 123.35
     radius_km: 100
+  - name: Neumayer III
+    lat: -70.67
+    lon: -8.27
+    radius_km: 100
 
 # --- Détection (Wille et al., algorithme v2.4 Antarctique) --------------------
 detection:
@@ -73,3 +77,30 @@ site:
   dpi: 110               # 8 x 8.6 pouces -> ~880 x 950 px
   quiver_every: 8        # un vecteur IVT tous les N points de grille
   render_workers: 4
+
+# --- Événements passés (events.py, réanalyse ERA5) ----------------------------
+events:
+  - id: 2018-12-concordia
+    start: 2018-12-16
+    end: 2018-12-24
+    title:
+      fr: "Décembre 2018 : rivière atmosphérique atlantique jusqu'à Concordia"
+      en: "December 2018: Atlantic atmospheric river reaching Concordia"
+    description:
+      fr: "Rivière atmosphérique d'origine atlantique, arrivée sur la Terre de Coats (ouest de la Terre de la Reine-Maud) le 17 décembre, puis traversée du plateau jusqu'à Concordia du 19 au 23 décembre. Le 21 décembre, la température à Concordia a atteint −14,7 °C, la deuxième plus élevée depuis 2005."
+      en: "Atlantic-sourced atmospheric river that made landfall over Coats Land (western Dronning Maud Land) on 17 December, then crossed the plateau to Concordia from 19 to 23 December. On 21 December the temperature at Concordia reached −14.7 °C, the second highest since 2005."
+    reference:
+      text: "Dutrievoz et al. (2026), The Cryosphere 20, 1025–1046"
+      url: "https://doi.org/10.5194/tc-20-1025-2026"
+  - id: 2022-03-east-antarctica
+    start: 2022-03-13
+    end: 2022-03-21
+    title:
+      fr: "Mars 2022 : vague de chaleur en Antarctique de l'Est"
+      en: "March 2022: East Antarctic heatwave"
+    description:
+      fr: "Rivière atmosphérique issue du secteur de l'océan Indien (15–19 mars 2022), à l'origine de la vague de chaleur record sur le plateau de l'Antarctique de l'Est, avec des températures exceptionnelles à Concordia le 18 mars."
+      en: "Atmospheric river from the Indian Ocean sector (15–19 March 2022) that drove the record-breaking heatwave over the East Antarctic plateau, with exceptional temperatures at Concordia on 18 March."
+    reference:
+      text: "Wille et al. (2024), Journal of Climate"
+      url: ""

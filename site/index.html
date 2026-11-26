@@ -4,45 +4,65 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Rivières atmosphériques Antarctique</title>
-  <meta name="description" content="Situation synoptique autour de l'Antarctique et rivières atmosphériques prévues (ECMWF HRES, détection Wille et al. 2021).">
+  <meta name="description" content="Situation synoptique autour de l'Antarctique et rivières atmosphériques (ECMWF HRES, ERA5, détection Wille et al. 2021). / Synoptic situation around Antarctica and atmospheric rivers.">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <h1>Rivières atmosphériques · Antarctique</h1>
-    <p id="run" class="muted">Chargement…</p>
+    <div class="topline">
+      <h1 data-i18n="title">Rivières atmosphériques · Antarctique</h1>
+      <div class="lang" role="group" aria-label="Langue / Language">
+        <button data-lang="fr" aria-pressed="true">FR</button>
+        <button data-lang="en" aria-pressed="false">EN</button>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-tab="forecast" aria-selected="true" data-i18n="tab_forecast">Prévision</button>
+      <button role="tab" data-tab="events" aria-selected="false" data-i18n="tab_events">Événements passés</button>
+    </nav>
+    <p id="info" class="muted"></p>
   </header>
 
   <main>
-    <section class="viewer" aria-label="Cartes de prévision">
+    <section class="viewer" aria-label="Cartes">
+      <div id="event-picker" class="event-picker" hidden></div>
       <div class="controls">
-        <button id="prev" title="Échéance précédente (←)" aria-label="Échéance précédente">‹</button>
-        <button id="play" title="Lecture / pause (espace)" aria-label="Lecture">▶</button>
-        <button id="next" title="Échéance suivante (→)" aria-label="Échéance suivante">›</button>
-        <input id="slider" type="range" min="0" max="0" value="0" aria-label="Échéance">
+        <button id="prev" aria-label="‹">‹</button>
+        <button id="play" aria-label="▶">▶</button>
+        <button id="next" aria-label="›">›</button>
+        <input id="slider" type="range" min="0" max="0" value="0">
         <output id="label" for="slider"></output>
       </div>
       <figure>
-        <img id="map" alt="Carte synoptique : IVT, pression au niveau de la mer et rivières atmosphériques">
+        <img id="map" alt="">
       </figure>
+      <div class="downloads">
+        <a id="dl-image" class="dl" download data-i18n="download_image">Télécharger l'image</a>
+        <a id="dl-gif" class="dl" download hidden data-i18n="download_gif">Télécharger l'animation (GIF)</a>
+      </div>
     </section>
 
     <aside>
+      <section id="event-about" hidden>
+        <h2 id="event-title"></h2>
+        <p id="event-desc" class="small"></p>
+        <p class="small muted" id="event-ref"></p>
+      </section>
       <section>
-        <h2>AR aux sites</h2>
-        <p class="muted small">Case colorée : un AR est détecté à moins du rayon du site à cette échéance. Clique sur une case pour afficher la carte.</p>
+        <h2 data-i18n="sites_title">AR aux sites</h2>
+        <p class="muted small" data-i18n="sites_help"></p>
         <div id="sites"></div>
       </section>
       <section>
-        <h2>Lecture des cartes</h2>
+        <h2 data-i18n="legend_title">Lecture des cartes</h2>
         <ul class="small">
-          <li><b>Couleurs</b> : transport intégré de vapeur d'eau (IVT), kg m<sup>-1</sup> s<sup>-1</sup>. Flèches là où IVT ≥ 250.</li>
-          <li><b>Traits noirs</b> : pression au niveau de la mer, tous les 4 hPa (masquée sur le haut plateau).</li>
-          <li><b>Contour magenta</b> : rivière atmosphérique détectée.</li>
+          <li data-i18n-html="legend_ivt"></li>
+          <li data-i18n-html="legend_msl"></li>
+          <li data-i18n-html="legend_ar"></li>
         </ul>
-        <h2>Méthode</h2>
+        <h2 data-i18n="method_title">Méthode</h2>
         <p class="small" id="method"></p>
-        <p class="small muted">Prévision déterministe ECMWF IFS (HRES, 0.25°), données ouvertes ECMWF sous licence CC-BY-4.0. Détection d'après Wille et al. (2021, <i>JGR Atmospheres</i>) : vIVT poléward supérieur au 98<sup>e</sup> percentile mensuel local (ERA5), objets s'étendant sur au moins 20° de latitude entre 37.5°S et 85°S. Produit expérimental, sans garantie.</p>
+        <p class="small muted" data-i18n-html="method_text"></p>
       </section>
     </aside>
   </main>

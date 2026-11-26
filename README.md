@@ -170,3 +170,14 @@ suivi par git (~3 Mo).
 **À savoir.** GitHub désactive les workflows planifiés d'un dépôt public après
 60 jours sans activité sur le dépôt. Un commit ou un clic sur « Enable workflow »
 les réactive.
+
+## Langues, sites et événements passés
+
+- Chaque carte est produite en français et en anglais (`site/maps/fr`, `site/maps/en`).
+  La page propose un sélecteur FR/EN (lien direct : `?lang=en`) et un bouton pour
+  télécharger l'image affichée.
+- Les sites (Dumont d'Urville, Concordia, Neumayer III) se règlent dans `config.yaml`, section `sites:`.
+- L'onglet « Événements passés » montre des animations ERA5 définies dans la section
+  `events:` de `config.yaml` : décembre 2018 (Concordia, Dutrievoz et al. 2026) et
+  mars 2022 (vague de chaleur en Antarctique de l'Est). Une fois les seuils calculés,
+  elles se génèrent avec `python events.py`, puis `site/events/` est commité.

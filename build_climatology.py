@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import numpy as np
@@ -30,17 +31,17 @@ def download(cfg: dict) -> list[Path]:
     out_dir.mkdir(parents=True, exist_ok=True)
     res = float(det["grid_res"])
     variable = det.get("variable", "vivt")
-    client = cdsapi.Client()
-    files = []
-    for year in range(int(clim["first_year"]), int(clim["last_year"]) + 1):
-        target = out_dir / f"era5_{variable}_{year}.nc"
-        files.append(target)
+    files = [out_dir / f"era5_{variable}_{y}.nc"
+             for y in range(int(clim["first_year"]), int(clim["last_year"]) + 1)]
+
+    def get_year(target: Path) -> None:
+        year = int(target.stem.rsplit("_", 1)[1])
         if target.exists() and target.stat().st_size > 0:
-            print(f"[{year}] déjà présent")
-            continue
+            print(f"[{year}] déjà présent", flush=True)
+            return
         print(f"[{year}] requête CDS…", flush=True)
         tmp = target.with_suffix(".part")
-        client.retrieve(
+        cdsapi.Client(quiet=True).retrieve(
             "reanalysis-era5-single-levels",
             {
                 "product_type": ["reanalysis"],
@@ -57,6 +58,11 @@ def download(cfg: dict) -> list[Path]:
             str(tmp),
         )
         tmp.rename(target)
+        print(f"[{year}] téléchargé ({target.stat().st_size / 1e6:.0f} Mo)", flush=True)
+
+    # quelques requêtes en parallèle : le CDS les met en file d'attente côté serveur
+    with ThreadPoolExecutor(max_workers=int(clim.get("parallel_requests", 4))) as ex:
+        list(ex.map(get_year, files))
     return files
 
 

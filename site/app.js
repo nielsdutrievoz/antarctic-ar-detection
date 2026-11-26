@@ -1,105 +1,281 @@
 "use strict";
 
+/* ------------------------------------------------------------------ textes */
+const I18N = {
+  fr: {
+    title: "Rivières atmosphériques · Antarctique",
+    doc_title: "Rivières atmosphériques Antarctique",
+    tab_forecast: "Prévision",
+    tab_events: "Événements passés",
+    download_image: "Télécharger l'image",
+    download_gif: "Télécharger l'animation (GIF)",
+    sites_title: "AR aux sites",
+    sites_help: "Case colorée : un AR est détecté à moins de 100 km du site. Clique sur une case pour afficher la carte.",
+    legend_title: "Lecture des cartes",
+    legend_ivt: "<b>Couleurs</b> : transport intégré de vapeur d'eau (IVT), kg m<sup>-1</sup> s<sup>-1</sup>. Flèches là où IVT ≥ 250.",
+    legend_msl: "<b>Traits noirs</b> : pression au niveau de la mer, tous les 4 hPa (masquée sur le haut plateau).",
+    legend_ar: "<b>Contour magenta</b> : rivière atmosphérique détectée.",
+    method_title: "Méthode",
+    method_text: "Prévisions : ECMWF IFS déterministe (HRES, 0.25°), données ouvertes ECMWF (CC-BY-4.0). Événements passés : réanalyse ERA5 (Copernicus). Détection d'après Wille et al. (2021, <i>JGR Atmospheres</i>) : vIVT poléward supérieur au 98<sup>e</sup> percentile mensuel local, objets s'étendant sur au moins 20° de latitude entre 37.5°S et 85°S. Produit expérimental, sans garantie.",
+    detection_on: (p) => `Seuils : 98e percentile mensuel du vIVT ERA5 ${p}.`,
+    detection_off: "Seuils climatologiques ERA5 pas encore calculés : les AR ne sont pas encore détectées.",
+    no_data: "Aucune carte disponible pour le moment.",
+    run_info: (model, run, gen) => `${model} · run du ${run} · mis à jour ${gen}`,
+    event_info: "Réanalyse ERA5, toutes les 6 h",
+    no_events: "Les animations des événements passés sont en préparation.",
+    no_ar: "pas d'AR",
+    ar_from: (s) => `AR dès ${s}`,
+    ar: "AR",
+    play: "Lecture", pause: "Pause", prev: "Précédente", next: "Suivante",
+    map_alt: "Carte : IVT, pression au niveau de la mer et rivières atmosphériques",
+    reference: "Référence :",
+  },
+  en: {
+    title: "Atmospheric rivers · Antarctica",
+    doc_title: "Antarctic atmospheric rivers",
+    tab_forecast: "Forecast",
+    tab_events: "Past events",
+    download_image: "Download image",
+    download_gif: "Download animation (GIF)",
+    sites_title: "ARs at sites",
+    sites_help: "Coloured cell: an AR is detected within 100 km of the site. Click a cell to show that map.",
+    legend_title: "Reading the maps",
+    legend_ivt: "<b>Colours</b>: integrated water vapour transport (IVT), kg m<sup>-1</sup> s<sup>-1</sup>. Arrows where IVT ≥ 250.",
+    legend_msl: "<b>Black lines</b>: mean sea-level pressure every 4 hPa (masked over the high plateau).",
+    legend_ar: "<b>Magenta contour</b>: detected atmospheric river.",
+    method_title: "Method",
+    method_text: "Forecasts: ECMWF IFS deterministic (HRES, 0.25°), ECMWF open data (CC-BY-4.0). Past events: ERA5 reanalysis (Copernicus). Detection after Wille et al. (2021, <i>JGR Atmospheres</i>): poleward vIVT above the local monthly 98<sup>th</sup> percentile, objects spanning at least 20° of latitude between 37.5°S and 85°S. Experimental product, no warranty.",
+    detection_on: (p) => `Thresholds: monthly 98th percentile of ERA5 vIVT ${p}.`,
+    detection_off: "ERA5 climatological thresholds not computed yet: ARs are not detected yet.",
+    no_data: "No maps available at the moment.",
+    run_info: (model, run, gen) => `${model} · run ${run} · updated ${gen}`,
+    event_info: "ERA5 reanalysis, every 6 h",
+    no_events: "Past-event animations are being prepared.",
+    no_ar: "no AR",
+    ar_from: (s) => `AR from ${s}`,
+    ar: "AR",
+    play: "Play", pause: "Pause", prev: "Previous", next: "Next",
+    map_alt: "Map: IVT, mean sea-level pressure and atmospheric rivers",
+    reference: "Reference:",
+  },
+};
+
+/* ------------------------------------------------------------------ état */
 const $ = (id) => document.getElementById(id);
-const fmt = new Intl.DateTimeFormat("fr-CH", {
-  weekday: "short", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", timeZone: "UTC",
-});
+const state = { lang: "fr", tab: "forecast", eventId: null, current: 0, timer: null };
+let forecast = null;          // manifest.json
+let events = [];              // events/events.json
+let view = { frames: [], sites: [] };   // ce que le visualiseur affiche
+
 const parseZ = (s) => new Date(s.replace(/Z$/, "") + (s.length <= 14 ? ":00:00Z" : ":00Z"));
+const fmtDate = (d, withYear = false) => new Intl.DateTimeFormat(state.lang === "fr" ? "fr-CH" : "en-GB", {
+  weekday: "short", day: "2-digit", month: withYear ? "short" : "2-digit",
+  ...(withYear ? { year: "numeric" } : {}), hour: "2-digit", minute: "2-digit", timeZone: "UTC",
+}).format(d) + " UTC";
+const t = (k) => I18N[state.lang][k];
 
-let frames = [];
-let current = 0;
-let timer = null;
-
+/* ------------------------------------------------------------------ démarrage */
 async function init() {
-  let m;
-  try {
-    const r = await fetch(`data/manifest.json?t=${Date.now()}`, { cache: "no-store" });
-    if (!r.ok) throw new Error(r.status);
-    m = await r.json();
-  } catch (e) {
-    $("run").textContent = "Aucune carte disponible pour le moment.";
-    return;
-  }
-  frames = m.frames;
-  const run = parseZ(m.run);
-  $("run").textContent = `${m.model} · run du ${fmt.format(run)} UTC · mis à jour ${m.generated.replace("T", " ")}`;
-  $("method").textContent = m.detection
-    ? `Détection : ${m.detection}.`
-    : "Seuils climatologiques ERA5 pas encore calculés : les AR ne sont pas encore détectées.";
-
-  const slider = $("slider");
-  slider.max = frames.length - 1;
-  slider.addEventListener("input", () => show(+slider.value));
-  $("prev").onclick = () => show(current - 1);
-  $("next").onclick = () => show(current + 1);
+  readUrl();
+  [forecast, events] = await Promise.all([
+    getJson("data/manifest.json"), getJson("events/events.json").then((e) => e || []),
+  ]);
+  document.querySelectorAll("[data-lang]").forEach((b) => (b.onclick = () => { state.lang = b.dataset.lang; save(); render(); }));
+  document.querySelectorAll("[data-tab]").forEach((b) => (b.onclick = () => { state.tab = b.dataset.tab; state.current = 0; stop(); save(); render(); }));
+  $("slider").addEventListener("input", () => show(+$("slider").value));
+  $("prev").onclick = () => show(state.current - 1);
+  $("next").onclick = () => show(state.current + 1);
   $("play").onclick = toggle;
   document.addEventListener("keydown", (e) => {
-    if (e.target.tagName === "INPUT" && e.target.type !== "range") return;
-    if (e.key === "ArrowLeft") { show(current - 1); e.preventDefault(); }
-    if (e.key === "ArrowRight") { show(current + 1); e.preventDefault(); }
-    if (e.key === " ") { toggle(); e.preventDefault(); }
+    if (["INPUT", "SELECT", "TEXTAREA"].includes(e.target.tagName) && e.target.type !== "range") return;
+    if (e.key === "ArrowLeft") { show(state.current - 1); e.preventDefault(); }
+    if (e.key === "ArrowRight") { show(state.current + 1); e.preventDefault(); }
+    if (e.key === " " && e.target.tagName !== "BUTTON") { toggle(); e.preventDefault(); }
   });
-
-  buildSites(m.sites);
-  // précharge les images pour une animation fluide
-  frames.forEach((f) => { const img = new Image(); img.src = f.file; });
-  show(0);
+  window.addEventListener("hashchange", () => { readUrl(); render(); });
+  render();
 }
 
-function buildSites(sites) {
+async function getJson(url) {
+  try {
+    const r = await fetch(`${url}?t=${Date.now()}`, { cache: "no-store" });
+    return r.ok ? await r.json() : null;
+  } catch { return null; }
+}
+
+/* URL : ?lang=en#events/2018-12-concordia  (langue mémorisée aussi localement) */
+function readUrl() {
+  const q = new URLSearchParams(location.search).get("lang");
+  let stored = null;
+  try { stored = localStorage.getItem("ar-lang"); } catch { /* navigation privée */ }
+  const nav = (navigator.language || "fr").toLowerCase().startsWith("fr") ? "fr" : "en";
+  state.lang = ["fr", "en"].includes(q) ? q : (stored || nav);
+  const [tab, id] = location.hash.replace(/^#/, "").split("/");
+  state.tab = tab === "events" ? "events" : "forecast";
+  if (id) state.eventId = decodeURIComponent(id);
+}
+
+function save() {
+  try { localStorage.setItem("ar-lang", state.lang); } catch { /* ignore */ }
+  const url = new URL(location.href);
+  url.searchParams.set("lang", state.lang);
+  url.hash = state.tab === "events" && state.eventId ? `events/${state.eventId}` : state.tab;
+  history.replaceState(null, "", url);
+}
+
+/* ------------------------------------------------------------------ rendu */
+function render() {
+  const L = I18N[state.lang];
+  document.documentElement.lang = state.lang;
+  document.title = L.doc_title;
+  document.querySelectorAll("[data-i18n]").forEach((el) => (el.textContent = L[el.dataset.i18n]));
+  document.querySelectorAll("[data-i18n-html]").forEach((el) => (el.innerHTML = L[el.dataset.i18nHtml]));
+  document.querySelectorAll("[data-lang]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.lang === state.lang));
+  document.querySelectorAll("[data-tab]").forEach((b) => b.setAttribute("aria-selected", b.dataset.tab === state.tab));
+  $("prev").setAttribute("aria-label", L.prev);
+  $("next").setAttribute("aria-label", L.next);
+  $("map").alt = L.map_alt;
+  $("method").textContent = forecast && forecast.detection ? L.detection_on(forecast.period) : (forecast ? L.detection_off : "");
+
+  if (state.tab === "forecast") renderForecast(); else renderEvents();
+  setPlayLabel();
+}
+
+function renderForecast() {
+  $("event-picker").hidden = true;
+  $("event-about").hidden = true;
+  $("dl-gif").hidden = true;
+  if (!forecast) { $("info").textContent = t("no_data"); view = { frames: [], sites: [] }; return clearViewer(); }
+  $("info").textContent = t("run_info")(forecast.model, fmtDate(parseZ(forecast.run), true), forecast.generated.replace("T", " "));
+  view = {
+    sites: forecast.sites,
+    frames: forecast.frames.map((f) => ({
+      url: `maps/${state.lang}/${f.file}`,
+      label: `+${f.step} h · ${fmtDate(parseZ(f.valid))}`,
+      short: `+${f.step} h`,
+      ar_sites: f.ar_sites,
+      dlname: `antarctic_ar_${forecast.run.replace(/[-:TZ]/g, "")}_${String(f.step).padStart(3, "0")}h_${state.lang}.png`,
+    })),
+  };
+  setupViewer();
+}
+
+function renderEvents() {
+  $("event-picker").hidden = false;
+  $("info").textContent = t("event_info");
+  const picker = $("event-picker");
+  picker.innerHTML = "";
+  if (!events.length) { $("info").textContent = t("no_events"); $("event-about").hidden = true; $("dl-gif").hidden = true; view = { frames: [], sites: [] }; return clearViewer(); }
+  if (!events.some((e) => e.id === state.eventId)) state.eventId = events[0].id;
+  for (const e of events) {
+    const b = document.createElement("button");
+    b.className = "event-card";
+    b.setAttribute("aria-pressed", e.id === state.eventId);
+    b.textContent = e.title[state.lang];
+    b.onclick = () => { state.eventId = e.id; state.current = 0; stop(); save(); render(); };
+    picker.appendChild(b);
+  }
+  const ev = events.find((e) => e.id === state.eventId);
+  $("event-about").hidden = false;
+  $("event-title").textContent = ev.title[state.lang];
+  $("event-desc").textContent = ev.description[state.lang];
+  const ref = ev.reference;
+  $("event-ref").innerHTML = "";
+  if (ref && ref.text) {
+    $("event-ref").append(`${t("reference")} `);
+    if (ref.url) {
+      const a = document.createElement("a");
+      a.href = ref.url; a.textContent = ref.text; a.rel = "noopener"; a.target = "_blank";
+      $("event-ref").appendChild(a);
+    } else $("event-ref").append(ref.text);
+  }
+  $("dl-gif").hidden = false;
+  $("dl-gif").href = `events/${ev.gif[state.lang]}`;
+  $("dl-gif").setAttribute("download", ev.gif[state.lang].split("/").pop());
+  view = {
+    sites: forecast ? forecast.sites : [],
+    frames: ev.frames.map((f) => ({
+      url: `events/${ev.id}/${state.lang}/${f.file}`,
+      label: fmtDate(parseZ(f.time), true),
+      short: fmtDate(parseZ(f.time)).replace(/ UTC$/, ""),
+      ar_sites: f.ar_sites,
+      dlname: `antarctic_ar_${ev.id}_${f.file.replace(".png", "")}_${state.lang}.png`,
+    })),
+  };
+  setupViewer();
+}
+
+function clearViewer() {
+  $("map").removeAttribute("src");
+  $("label").textContent = "";
+  $("sites").innerHTML = "";
+  $("dl-image").removeAttribute("href");
+}
+
+function setupViewer() {
+  const n = view.frames.length;
+  $("slider").max = Math.max(0, n - 1);
+  state.current = Math.min(state.current, n - 1);
+  view.frames.forEach((f) => { const im = new Image(); im.src = f.url; });   // préchargement
+  buildSites();
+  show(state.current);
+}
+
+function buildSites() {
   const box = $("sites");
   box.innerHTML = "";
-  for (const s of sites) {
+  const frames = view.frames;
+  for (const s of view.sites) {
     const hits = frames.filter((f) => f.ar_sites.includes(s.name));
     const div = document.createElement("div");
     div.className = "site";
-    const first = hits.length ? `AR dès +${hits[0].step} h` : "pas d'AR";
-    div.innerHTML = `<div class="site-name"><span>${escapeHtml(s.name)}</span>` +
-      (hits.length ? `<span class="badge">${first}</span>` : `<span class="muted small">${first}</span>`) +
-      `</div>`;
+    const head = document.createElement("div");
+    head.className = "site-name";
+    const name = document.createElement("span");
+    name.textContent = s.name;
+    const status = document.createElement("span");
+    if (hits.length) { status.className = "badge"; status.textContent = t("ar_from")(hits[0].short); }
+    else { status.className = "muted small"; status.textContent = t("no_ar"); }
+    head.append(name, status);
     const strip = document.createElement("div");
     strip.className = "strip";
     frames.forEach((f, i) => {
       const b = document.createElement("button");
       const ar = f.ar_sites.includes(s.name);
       if (ar) b.classList.add("ar");
-      b.title = `+${f.step} h · ${fmt.format(parseZ(f.valid))} UTC${ar ? " · AR" : ""}`;
+      b.title = `${f.label}${ar ? " · " + t("ar") : ""}`;
       b.setAttribute("aria-label", b.title);
       b.dataset.i = i;
       b.onclick = () => show(i);
       strip.appendChild(b);
     });
-    div.appendChild(strip);
     const axis = document.createElement("div");
     axis.className = "axis";
-    axis.innerHTML = `<span>+0 h</span><span>+${frames[frames.length - 1].step} h</span>`;
-    div.appendChild(axis);
+    if (frames.length) axis.innerHTML = `<span>${frames[0].short}</span><span>${frames[frames.length - 1].short}</span>`;
+    div.append(head, strip, axis);
     box.appendChild(div);
   }
 }
 
 function show(i) {
-  if (!frames.length) return;
-  current = (i + frames.length) % frames.length;
-  const f = frames[current];
-  $("map").src = f.file;
-  $("slider").value = current;
-  $("label").textContent = `+${f.step} h · ${fmt.format(parseZ(f.valid))} UTC`;
-  document.querySelectorAll(".strip button").forEach((b) => b.classList.toggle("current", +b.dataset.i === current));
+  const n = view.frames.length;
+  if (!n) return;
+  state.current = (i + n) % n;
+  const f = view.frames[state.current];
+  $("map").src = f.url;
+  $("slider").value = state.current;
+  $("label").textContent = f.label;
+  $("dl-image").href = f.url;
+  $("dl-image").setAttribute("download", f.dlname);
+  document.querySelectorAll(".strip button").forEach((b) => b.classList.toggle("current", +b.dataset.i === state.current));
 }
 
-function toggle() {
-  if (timer) {
-    clearInterval(timer); timer = null;
-    $("play").textContent = "▶"; $("play").setAttribute("aria-label", "Lecture");
-  } else {
-    timer = setInterval(() => show(current + 1), 700);
-    $("play").textContent = "❚❚"; $("play").setAttribute("aria-label", "Pause");
-  }
-}
-
-function escapeHtml(s) {
-  return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+function toggle() { state.timer ? stop() : start(); }
+function start() { state.timer = setInterval(() => show(state.current + 1), 700); setPlayLabel(); }
+function stop() { clearInterval(state.timer); state.timer = null; setPlayLabel(); }
+function setPlayLabel() {
+  $("play").textContent = state.timer ? "❚❚" : "▶";
+  $("play").setAttribute("aria-label", state.timer ? t("pause") : t("play"));
 }
 
 init();
