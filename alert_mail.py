@@ -56,7 +56,7 @@ def coords(sub: dict) -> str:
 
 
 def site_link(mc: dict, **query) -> str:
-    return mc["site_url"] + "?" + urllib.parse.urlencode(query)
+    return mc["site_url"] + "?" + urllib.parse.urlencode(query, safe=",")
 
 
 def parse_z(s: str) -> dt.datetime:
@@ -139,9 +139,10 @@ class Mailer:
 TXT = {
     "fr": dict(
         confirm_subject="Confirme ton alerte AR pour {place}",
+        confirm_subject_n="Confirme tes alertes AR pour {n} lieux",
         confirm_title="Confirme ton alerte",
-        confirm_body="Tu as demandé à être prévenu quand une rivière atmosphérique est prévue à <b>{place}</b> "
-                     "({coords}, rayon de {radius} km), selon : {algos}.",
+        confirm_body="Tu as demandé à être prévenu quand une rivière atmosphérique est prévue à moins de "
+                     "{radius} km de ces lieux :",
         confirm_button="Activer l'alerte",
         confirm_ignore="Si tu n'es pas à l'origine de cette demande, ignore simplement cet e-mail : "
                        "aucune alerte ne sera envoyée.",
@@ -160,9 +161,10 @@ TXT = {
     ),
     "en": dict(
         confirm_subject="Confirm your AR alert for {place}",
+        confirm_subject_n="Confirm your AR alerts for {n} locations",
         confirm_title="Confirm your alert",
-        confirm_body="You asked to be notified when an atmospheric river is forecast at <b>{place}</b> "
-                     "({coords}, {radius} km radius), according to: {algos}.",
+        confirm_body="You asked to be notified when an atmospheric river is forecast within {radius} km of "
+                     "these locations:",
         confirm_button="Activate the alert",
         confirm_ignore="If you did not make this request, simply ignore this email: no alert will be sent.",
         alert_subject="Atmospheric river forecast at {place} from {start}",
@@ -202,19 +204,29 @@ def fmt(t: dt.datetime, lang: str) -> str:
 
 
 # --------------------------------------------------------------------------- confirmation
-def confirmation_message(mailer: Mailer, mc: dict, sub: dict) -> EmailMessage:
-    lang = sub["lang"] if sub["lang"] in TXT else "fr"
+def confirmation_message(mailer: Mailer, mc: dict, subs: list[dict]) -> EmailMessage:
+    """Un seul e-mail pour toutes les inscriptions en attente d'une même adresse."""
+    last = subs[-1]
+    lang = last["lang"] if last["lang"] in TXT else "fr"
     T = TXT[lang]
-    place = place_name(sub)
-    algos = ", ".join(ALGOS[a]["label"] for a in ORDER if a in sub["algorithms"])
-    confirm = site_link(mc, lang=lang, confirm=sub["token"])
-    unsub = site_link(mc, lang=lang, unsubscribe=sub["token"])
-    body = T["confirm_body"].format(place=html.escape(place), coords=coords(sub), radius=mc["radius_km"],
-                                    algos=html.escape(algos))
-    inner = (f"<p>{body}</p><p style='margin:22px 0'><a href='{html.escape(confirm)}' style='{CSS_BTN}'>"
+    tokens = ",".join(x["token"] for x in subs)
+    confirm = site_link(mc, lang=lang, confirm=tokens)
+    unsub = site_link(mc, lang=lang, unsubscribe=tokens)
+    items = []
+    for x in subs:
+        algos = ", ".join(ALGOS[a]["label"] for a in ORDER if a in x["algorithms"])
+        name = f"<b>{html.escape(x['station'])}</b> ({coords(x)})" if x.get("station") else f"<b>{coords(x)}</b>"
+        items.append((name, algos))
+    body = T["confirm_body"].format(radius=mc["radius_km"])
+    lst = "".join(f"<li style='margin:4px 0'>{n} · <span style='color:#5b6b7b'>{html.escape(a)}</span></li>" for n, a in items)
+    inner = (f"<p>{body}</p><ul style='padding-left:20px;margin:8px 0 0'>{lst}</ul>"
+             f"<p style='margin:22px 0'><a href='{html.escape(confirm)}' style='{CSS_BTN}'>"
              f"{T['confirm_button']}</a></p><p style='color:#5b6b7b;font-size:13px'>{T['confirm_ignore']}</p>")
-    msg = mailer.new(lang, sub["email"], T["confirm_subject"].format(place=place), unsub)
-    text = (f"{T['confirm_title']}\n\n" + html.unescape(body.replace("<b>", "").replace("</b>", ""))
+    subject = (T["confirm_subject"].format(place=place_name(last)) if len(subs) == 1
+               else T["confirm_subject_n"].format(n=len(subs)))
+    msg = mailer.new(lang, last["email"], subject, unsub)
+    plain = [f"- {html.unescape(n.replace('<b>', '').replace('</b>', ''))} · {a}" for n, a in items]
+    text = (f"{T['confirm_title']}\n\n{body}\n" + "\n".join(plain)
             + f"\n\n{T['confirm_button']} : {confirm}\n\n{T['confirm_ignore']}\n")
     msg.set_content(text)
     footer = f"<a href='{html.escape(mc['site_url'])}' style='color:#2a6f97'>{html.escape(mc['site_url'])}</a>"
@@ -226,25 +238,27 @@ def cmd_confirm(cfg: dict, args) -> None:
     mc = cfg["alert_mail"]
     db = Supabase(mc["supabase_url"], os.environ.get("SUPABASE_SECRET_KEY", ""))
     subs = db.select("select=*&confirm_sent_at=is.null&unsubscribed_at=is.null&order=created_at")
-    print(f"{len(subs)} inscription(s) à confirmer")
+    groups: dict[str, list[dict]] = {}
+    for sub in subs:
+        groups.setdefault(sub["email"].lower(), []).append(sub)
+    print(f"{len(subs)} inscription(s) à confirmer, {len(groups)} adresse(s)")
+    now = lambda: dt.datetime.now(dt.timezone.utc).isoformat()
     mailer = Mailer(mc, args.dry_run)
     try:
-        for sub in subs:
-            print(f"  → {place_name(sub)} ({sub['lang']})")
-            if sub["email"].rsplit(".", 1)[-1] in RESERVED_TLD:
-                print("    domaine réservé (test) : inscription annulée sans envoi")
-                if not args.dry_run:
-                    db.update(sub["id"], {"unsubscribed_at": dt.datetime.now(dt.timezone.utc).isoformat()})
-                continue
-            try:
-                mailer.send(confirmation_message(mailer, mc, sub))
-            except smtplib.SMTPRecipientsRefused:
-                print("    adresse refusée par le serveur : inscription annulée")
-                if not args.dry_run:
-                    db.update(sub["id"], {"unsubscribed_at": dt.datetime.now(dt.timezone.utc).isoformat()})
-                continue
+        for email, group in groups.items():
+            print(f"  → {len(group)} lieu(x) : {', '.join(place_name(x) for x in group)}")
+            cancel = email.rsplit(".", 1)[-1] in RESERVED_TLD
+            if cancel:
+                print("    domaine réservé (test) : inscriptions annulées sans envoi")
+            else:
+                try:
+                    mailer.send(confirmation_message(mailer, mc, group))
+                except smtplib.SMTPRecipientsRefused:
+                    print("    adresse refusée par le serveur : inscriptions annulées")
+                    cancel = True
             if not args.dry_run:
-                db.update(sub["id"], {"confirm_sent_at": dt.datetime.now(dt.timezone.utc).isoformat()})
+                for x in group:
+                    db.update(x["id"], {"unsubscribed_at": now()} if cancel else {"confirm_sent_at": now()})
     finally:
         mailer.close()
 
@@ -417,7 +431,7 @@ def cmd_test(cfg: dict, args) -> None:
     try:
         with tempfile.TemporaryDirectory() as tmp:
             mailer.send(alert_message(mailer, mc, fc, sub, new, Path(tmp), test=True))
-            mailer.send(confirmation_message(mailer, mc, sub))
+            mailer.send(confirmation_message(mailer, mc, [sub, dict(sub, station="Vostok", lat=-78.46, lon=106.84)]))
     finally:
         mailer.close()
     print("Exemples envoyés (alerte + confirmation).")

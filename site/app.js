@@ -21,17 +21,20 @@ const I18N = {
     alert_title: "Être prévenu quand un AR approche",
     alert_intro: "Choisis un lieu et un ou plusieurs algorithmes : tu recevras un e-mail dès qu'une rivière atmosphérique y est prévue dans les cinq prochains jours, avec l'animation de la situation synoptique autour de l'Antarctique.",
     f_email: "Adresse e-mail",
-    f_where: "Lieu surveillé",
+    f_where: "Lieux surveillés",
+    f_add: "+ Ajouter ce lieu",
+    remove: "Retirer",
+    err_max: "10 lieux au maximum par inscription.",
     f_station: "Station",
     f_coords: "Coordonnées",
     f_lat: "Latitude (°, négative au sud)",
     f_lon: "Longitude (°E, de −180 à 180)",
-    f_radius: "Un AR est signalé s'il passe à moins de 100 km du lieu choisi.",
+    f_radius: "Ajoute un ou plusieurs lieux (10 au maximum). Un AR est signalé s'il passe à moins de 100 km de l'un d'eux.",
     f_algos: "Algorithme(s)",
     f_lang: "Langue des e-mails",
-    f_consent: "J'accepte que mon adresse e-mail et le lieu choisi soient conservés uniquement pour l'envoi de ces alertes. Je peux me désinscrire à tout moment via le lien présent dans chaque e-mail.",
+    f_consent: "J'accepte que mon adresse e-mail et les lieux choisis soient conservés uniquement pour l'envoi de ces alertes. Je peux me désinscrire à tout moment via le lien présent dans chaque e-mail.",
     f_submit: "S'inscrire à l'alerte",
-    alert_where: "Lieu choisi",
+    alert_where: "Lieux choisis",
     alert_how: "Fonctionnement",
     alert_steps: [
       "Après l'inscription, un e-mail de confirmation t'est envoyé : l'alerte n'est active qu'une fois le lien cliqué.",
@@ -45,13 +48,13 @@ const I18N = {
     err_algos: "Choisis au moins un algorithme.",
     err_consent: "Merci d'accepter la conservation des données pour recevoir les alertes.",
     wille_limit: "indisponible au sud de 85°S",
-    pick_label: (name, lat, lon) => `${name ? name + " · " : ""}${lat}, ${lon}`,
     sub_soon: (sum) => `Inscription prête : ${sum}. Les inscriptions ouvrent très prochainement ; rien n'a été envoyé pour le moment.`,
-    sub_ok: (email) => `C'est presque fini : un e-mail de confirmation a été envoyé à ${email}. Clique sur le lien qu'il contient pour activer l'alerte.`,
+    sub_ok: (email, n) => `C'est presque fini : un e-mail de confirmation a été envoyé à ${email}. Clique sur le lien qu'il contient pour activer ${n > 1 ? `les alertes des ${n} lieux` : "l'alerte"}.`,
     sub_fail: "L'inscription n'a pas pu être enregistrée. Réessaie plus tard.",
     link_wait: "Traitement du lien…",
     link_confirmed: (p) => `Alerte activée pour ${p}. Tu recevras un e-mail dès qu'un AR y sera prévu.`,
-    link_unsubscribed: (p) => `Désinscription effectuée pour ${p}. Tu ne recevras plus d'alerte pour ce lieu.`,
+    and: "et",
+    link_unsubscribed: (p) => `Désinscription effectuée : tu ne recevras plus d'alerte pour ${p}.`,
     link_fail: "Ce lien n'est pas valide ou a expiré.",
     station_groups: { peninsula: "Péninsule antarctique", east: "Antarctique de l'Est", west: "Antarctique de l'Ouest et mer de Ross", plateau: "Plateau" },
     refs_label: "Références",
@@ -104,17 +107,20 @@ const I18N = {
     alert_title: "Get notified when an AR is coming",
     alert_intro: "Choose a location and one or more algorithms: you will receive an email as soon as an atmospheric river is forecast there within the next five days, with an animation of the synoptic situation around Antarctica.",
     f_email: "Email address",
-    f_where: "Location",
+    f_where: "Locations",
+    f_add: "+ Add this location",
+    remove: "Remove",
+    err_max: "At most 10 locations per subscription.",
     f_station: "Station",
     f_coords: "Coordinates",
     f_lat: "Latitude (°, negative south)",
     f_lon: "Longitude (°E, −180 to 180)",
-    f_radius: "An AR is reported when it passes within 100 km of the chosen location.",
+    f_radius: "Add one or more locations (up to 10). An AR is reported when it passes within 100 km of any of them.",
     f_algos: "Algorithm(s)",
     f_lang: "Email language",
-    f_consent: "I agree that my email address and the chosen location are stored only to send these alerts. I can unsubscribe at any time through the link in every email.",
+    f_consent: "I agree that my email address and the chosen locations are stored only to send these alerts. I can unsubscribe at any time through the link in every email.",
     f_submit: "Subscribe to the alert",
-    alert_where: "Selected location",
+    alert_where: "Selected locations",
     alert_how: "How it works",
     alert_steps: [
       "After subscribing, you receive a confirmation email: the alert is only active once you click its link.",
@@ -128,13 +134,13 @@ const I18N = {
     err_algos: "Choose at least one algorithm.",
     err_consent: "Please accept data storage to receive alerts.",
     wille_limit: "unavailable south of 85°S",
-    pick_label: (name, lat, lon) => `${name ? name + " · " : ""}${lat}, ${lon}`,
     sub_soon: (sum) => `Subscription ready: ${sum}. Subscriptions open very soon; nothing has been sent yet.`,
-    sub_ok: (email) => `Almost done: a confirmation email was sent to ${email}. Click the link inside to activate the alert.`,
+    sub_ok: (email, n) => `Almost done: a confirmation email was sent to ${email}. Click the link inside to activate ${n > 1 ? `the alerts for the ${n} locations` : "the alert"}.`,
     sub_fail: "The subscription could not be saved. Please try again later.",
     link_wait: "Processing the link…",
     link_confirmed: (p) => `Alert activated for ${p}. You will receive an email as soon as an AR is forecast there.`,
-    link_unsubscribed: (p) => `Unsubscribed from ${p}. You will no longer receive alerts for this location.`,
+    and: "and",
+    link_unsubscribed: (p) => `Unsubscribed: you will no longer receive alerts for ${p}.`,
     link_fail: "This link is invalid or has expired.",
     station_groups: { peninsula: "Antarctic Peninsula", east: "East Antarctica", west: "West Antarctica and Ross Sea", plateau: "Plateau" },
     refs_label: "References",
@@ -513,7 +519,20 @@ function mapXY(lat, lon) {
   return [MAP_GEOM.cx + r * MAP_GEOM.rx * Math.sin(a), MAP_GEOM.cy - r * MAP_GEOM.ry * Math.cos(a)];
 }
 
-const alertState = { mode: "station", station: "Concordia", lang: null, algos: new Set(), touched: false };
+const alertState = { mode: "station", station: "Concordia", lang: null, algos: new Set(), places: [], touched: false };
+const MAX_PLACES = 10;
+const fmtPlace = (p) => p.name || `${Math.abs(p.lat).toFixed(2)}°S, ${Math.abs(p.lon).toFixed(2)}°${p.lon < 0 ? "W" : "E"}`;
+const samePlace = (a, b) => a.lat.toFixed(2) === b.lat.toFixed(2) && a.lon.toFixed(2) === b.lon.toFixed(2);
+/* lieux de l'inscription : la liste, ou à défaut le lieu en cours de sélection */
+function alertPlaces() {
+  if (alertState.places.length) return alertState.places;
+  const p = alertPoint();
+  return p ? [p] : [];
+}
+function joinList(items) {
+  if (items.length < 2) return items.join("");
+  return `${items.slice(0, -1).join(", ")} ${t("and")} ${items[items.length - 1]}`;
+}
 
 function setupAlert() {
   const form = $("alert-form");
@@ -523,6 +542,7 @@ function setupAlert() {
   ["a-lat", "a-lon"].forEach((id) => ($(id).oninput = updateAlert));
   $("a-email").oninput = () => alertState.touched && validateAlert();
   $("a-consent").onchange = () => alertState.touched && validateAlert();
+  $("a-add").onclick = addPlace;
   form.onsubmit = submitAlert;
 }
 
@@ -559,17 +579,38 @@ function alertPoint() {
   return { name: null, lat, lon };
 }
 
+function addPlace() {
+  const L = I18N[state.lang];
+  const p = alertPoint();
+  if (!p) { showErr("e-where", L.err_where); return; }
+  if (alertState.places.some((q) => samePlace(q, p))) return;
+  if (alertState.places.length >= MAX_PLACES) { showErr("e-where", L.err_max); return; }
+  alertState.places.push(p);
+  showErr("e-where", "");
+  updateAlert();
+}
+
 function updateAlert() {
   const L = I18N[state.lang];
   $("a-station-box").hidden = alertState.mode !== "station";
   $("a-coords-box").hidden = alertState.mode !== "coords";
   const p = alertPoint();
+  const places = alertPlaces();
+  // lieux ajoutés
+  $("a-places").replaceChildren(...alertState.places.map((q, i) => {
+    const li = document.createElement("li");
+    const x = Object.assign(document.createElement("button"), { type: "button", textContent: "×", title: L.remove });
+    x.setAttribute("aria-label", `${L.remove} ${fmtPlace(q)}`);
+    x.onclick = () => { alertState.places.splice(i, 1); updateAlert(); };
+    li.append(document.createTextNode(fmtPlace(q)), x);
+    return li;
+  }));
   // algorithmes : ceux du site ; Wille ne détecte rien au sud de 85°S
   const box = $("a-algos");
   const avail = Object.keys(ALGOS);
   if (!alertState.algos.size) alertState.algos.add(state.algo && ALGOS[state.algo] ? state.algo : avail[0]);
   box.replaceChildren(...avail.map((a) => {
-    const off = a.startsWith("wille") && p && p.lat < WILLE_SOUTH;
+    const off = a.startsWith("wille") && places.length > 0 && places.every((q) => q.lat < WILLE_SOUTH);
     if (off) alertState.algos.delete(a);
     const lab = document.createElement("label");
     lab.className = off ? "disabled" : "";
@@ -580,18 +621,20 @@ function updateAlert() {
     lab.append(cb, dot, document.createTextNode(ALGOS[a].label + (off ? ` (${L.wille_limit})` : "")));
     return lab;
   }));
-  // repère sur la carte
+  // repères sur la carte : lieux ajoutés (pleins) et lieu en cours de sélection (creux)
+  const place = (el, q) => { const [x, y] = mapXY(q.lat, q.lon); el.style.left = `${x * 100}%`; el.style.top = `${y * 100}%`; };
+  document.querySelectorAll("#pickmap .pin.added").forEach((el) => el.remove());
+  alertState.places.forEach((q) => {
+    const el = Object.assign(document.createElement("span"), { className: "pin added" });
+    place(el, q);
+    $("pickmap").append(el);
+  });
   const pin = $("pin");
-  pin.hidden = !p;
-  if (p) {
-    const [x, y] = mapXY(p.lat, p.lon);
-    pin.style.left = `${x * 100}%`;
-    pin.style.top = `${y * 100}%`;
-    $("pick-label").textContent = L.pick_label(p.name, `${Math.abs(p.lat).toFixed(2)}°S`,
-      `${Math.abs(p.lon).toFixed(2)}°${p.lon < 0 ? "W" : "E"}`);
-  } else {
-    $("pick-label").textContent = "";
-  }
+  const showPreview = p && !alertState.places.some((q) => samePlace(q, p));
+  pin.hidden = !showPreview;
+  pin.classList.toggle("preview", alertState.places.length > 0);
+  if (showPreview) place(pin, p);
+  $("pick-label").textContent = places.map(fmtPlace).join(" · ");
   if (alertState.touched) validateAlert();
 }
 
@@ -608,7 +651,7 @@ function validateAlert() {
   const okEmail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
   const ok = [
     showErr("e-email", okEmail ? "" : L.err_email, $("a-email")),
-    showErr("e-where", alertPoint() ? "" : L.err_where),
+    showErr("e-where", alertPlaces().length ? "" : L.err_where),
     showErr("e-algos", alertState.algos.size ? "" : L.err_algos),
     showErr("e-consent", $("a-consent").checked ? "" : L.err_consent),
   ];
@@ -623,26 +666,27 @@ async function submitAlert(e) {
   res.hidden = true;
   res.className = "notice";
   if (!validateAlert()) return;
-  const p = alertPoint();
-  const sub = {
-    email: $("a-email").value.trim(),
-    station: p.name, lat: +p.lat.toFixed(2), lon: +p.lon.toFixed(2),
+  const places = alertPlaces();
+  const email = $("a-email").value.trim();
+  const subs = places.map((p) => ({
+    email, station: p.name, lat: +p.lat.toFixed(2), lon: +p.lon.toFixed(2),
     algorithms: [...alertState.algos], lang: alertState.lang,
-  };
+  }));
   if ($("a-website").value) return;          // champ piège : rempli seulement par les robots
   if (!SUPABASE_URL) {
-    const place = p.name || `${sub.lat}, ${sub.lon}`;
-    res.textContent = L.sub_soon(`${place} · ${sub.algorithms.map((a) => ALGOS[a].label).join(", ")}`);
+    res.textContent = L.sub_soon(`${joinList(places.map(fmtPlace))} · ${[...alertState.algos].map((a) => ALGOS[a].label).join(", ")}`);
     res.hidden = false;
     return;
   }
   const btn = $("alert-form").querySelector('button[type="submit"]');
   btn.disabled = true;
   try {
-    const r = await supa("subscriptions", sub);
-    // 409 : déjà inscrit à ce lieu. Même message, pour ne pas révéler qui est inscrit.
-    if (!r.ok && r.status !== 409) throw new Error(r.status);
-    res.textContent = L.sub_ok(sub.email);
+    // une ligne par lieu ; 409 : déjà inscrit à ce lieu. Même message, pour ne pas révéler qui est inscrit.
+    for (const sub of subs) {
+      const r = await supa("subscriptions", sub);
+      if (!r.ok && r.status !== 409) throw new Error(r.status);
+    }
+    res.textContent = L.sub_ok(email, subs.length);
     res.classList.add("ok");
   } catch {
     res.textContent = L.sub_fail;
@@ -662,7 +706,7 @@ async function handleAlertLink() {
   const q = new URLSearchParams(location.search);
   const action = q.has("confirm") ? "confirm" : q.has("unsubscribe") ? "unsubscribe" : null;
   if (!action) return;
-  const token = q.get(action);
+  const tokens = (q.get(action) || "").split(",").filter(Boolean).slice(0, MAX_PLACES);
   q.delete(action);
   const url = new URL(location.href);
   url.search = q.toString();
@@ -677,12 +721,16 @@ async function handleAlertLink() {
   box.className = "notice";
   box.textContent = L.link_wait;
   try {
-    if (!SUPABASE_URL || !/^[0-9a-f-]{36}$/i.test(token)) throw new Error("bad");
-    const r = await supa(`rpc/${action === "confirm" ? "confirm_subscription" : "unsubscribe"}`, { p_token: token });
-    if (!r.ok) throw new Error(r.status);
-    const place = await r.json();
-    if (!place) throw new Error("unknown");
-    box.textContent = action === "confirm" ? L.link_confirmed(place) : L.link_unsubscribed(place);
+    if (!SUPABASE_URL || !tokens.length || !tokens.every((k) => /^[0-9a-f-]{36}$/i.test(k))) throw new Error("bad");
+    const done = [];
+    for (const token of tokens) {
+      const r = await supa(`rpc/${action === "confirm" ? "confirm_subscription" : "unsubscribe"}`, { p_token: token });
+      if (!r.ok) throw new Error(r.status);
+      const place = await r.json();
+      if (place) done.push(place);
+    }
+    if (!done.length) throw new Error("unknown");
+    box.textContent = action === "confirm" ? L.link_confirmed(joinList(done)) : L.link_unsubscribed(joinList(done));
     box.classList.add("ok");
   } catch {
     box.textContent = L.link_fail;

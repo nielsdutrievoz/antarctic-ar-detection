@@ -250,6 +250,8 @@
               <input id="a-lon" type="number" step="0.01" min="-180" max="180" placeholder="123.35" inputmode="decimal">
             </div>
           </div>
+          <div class="btn-row add-row"><button type="button" id="a-add" class="btn ghost" data-i18n="f_add">+ Ajouter ce lieu</button></div>
+          <ul class="places" id="a-places" aria-live="polite"></ul>
           <p class="err" id="e-where" hidden></p>
           <p class="hint" data-i18n="f_radius"></p>
         </fieldset>
@@ -283,7 +285,7 @@
         <p class="eyebrow" data-i18n="alert_where">Lieu choisi</p>
         <div class="pickmap" id="pickmap">
           <img id="pickmap-img" alt="">
-          <span class="pin" id="pin" hidden></span>
+          <span class="pin preview" id="pin" hidden></span>
         </div>
         <p class="hint" id="pick-label"></p>
       </section>
