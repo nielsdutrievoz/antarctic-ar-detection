@@ -17,6 +17,11 @@ const I18N = {
     tab_events: "Événements passés",
     tab_method: "Méthode",
     tab_alert: "Alerte",
+    contact_label: "Contact",
+    contact_title: "Un site tout neuf",
+    contact_text: "Ce site vient d'être mis en ligne et évolue encore. Une erreur, une idée, une station à ajouter, un événement passé à documenter ? N'hésite pas à m'écrire : tous les retours sont bienvenus.",
+    contact_button: "M'écrire",
+    contact_subject: "Site AR Antarctique : retour",
     alert_eyebrow: "Alerte par e-mail",
     alert_title: "Être prévenu quand un AR approche",
     alert_intro: "Choisis un lieu et un ou plusieurs algorithmes : tu recevras un e-mail dès qu'une rivière atmosphérique y est prévue dans les cinq prochains jours, avec l'animation de la situation synoptique autour de l'Antarctique.",
@@ -103,6 +108,11 @@ const I18N = {
     tab_events: "Past events",
     tab_method: "Method",
     tab_alert: "Alert",
+    contact_label: "Contact",
+    contact_title: "A brand-new site",
+    contact_text: "This site has just gone online and is still evolving. Spotted an error, have an idea, a station to add or a past event worth documenting? Feel free to write to me: all feedback is welcome.",
+    contact_button: "Write to me",
+    contact_subject: "Antarctic AR site: feedback",
     alert_eyebrow: "Email alert",
     alert_title: "Get notified when an AR is coming",
     alert_intro: "Choose a location and one or more algorithms: you will receive an email as soon as an atmospheric river is forecast there within the next five days, with an animation of the synoptic situation around Antarctica.",
@@ -275,6 +285,7 @@ function render() {
   $("next").setAttribute("aria-label", L.next);
   $("map").alt = L.map_alt;
   $("home-link").href = L.home;
+  $("contact-mail").href = `mailto:${["niels", "dutrievoz.eu"].join("@")}?subject=${encodeURIComponent(L.contact_subject)}`;
   $("back-link").href = L.home;
   $("method").textContent = forecast && (forecast.algorithms || []).length ? L.detection_on(forecast.period) : (forecast ? L.detection_off : "");
 
