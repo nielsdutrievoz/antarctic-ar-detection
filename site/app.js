@@ -172,9 +172,9 @@ const I18N = {
 
 /* ------------------------------------------------------------------ état */
 const $ = (id) => document.getElementById(id);
-/* Onglet Alerte : masqué tant que l'envoi des e-mails n'est pas validé ; visible avec ?alerte=1
-   pour les tests. Les liens des e-mails (confirmation, désinscription) fonctionnent toujours. */
-const ALERT_ENABLED = false || new URLSearchParams(location.search).has("alerte");
+/* Onglet Alerte : interrupteur général (false = onglet masqué ; les liens des e-mails
+   de confirmation et de désinscription fonctionnent toujours). */
+const ALERT_ENABLED = true;
 const state = { lang: "fr", tab: "forecast", eventId: null, current: 0, timer: null, algo: null };
 const ALGOS = {
   wille_vivt: { label: "Wille vIVT", color: "#00b8d4" },
