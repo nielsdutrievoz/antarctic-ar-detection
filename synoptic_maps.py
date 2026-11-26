@@ -98,6 +98,7 @@ def main(argv=None):
 
     print(f"Run HRES {base:%Y-%m-%d %HZ}, {len(steps)} échéances", flush=True)
     frames, futures = [], []
+    all_masks = {a: [] for a in algos}       # pour les alertes par e-mail (alert_mail.py)
     run_fr, run_en = (maprender.fmt_time(base, l, weekday=False) for l in ("fr", "en"))
     with ProcessPoolExecutor(max_workers=int(sc.get("render_workers", 4))) as pool:
         for step in steps:
@@ -105,6 +106,8 @@ def main(argv=None):
             vt = base + dt.timedelta(hours=step)
             fl = load_step(cfg, base, step, lat, lon, levels)
             masks = det.run(vt, fl)
+            for a, m in masks.items():
+                all_masks[a].append(m)
             hits = det.sites_hit(masks)
             npz = tmp / f"frame_{step:03d}.npz"
             np.savez(npz, lat=lat, lon=lon, uivt=fl["uivt"], vivt=fl["vivt"], msl=fl["msl"], sp=fl["sp"],
@@ -124,6 +127,16 @@ def main(argv=None):
                   + "  ".join(f"{a}: {', '.join(h) or '-'}" for a, h in hits.items()), flush=True)
         for f in futures:
             f.result()
+
+    # masques AR de toutes les échéances, relus par alert_mail.py
+    grids = {}
+    for a in algos:
+        glat, glon = det.grid(a)
+        grids[a] = np.stack(all_masks[a])
+        grids[f"{a}_lat"], grids[f"{a}_lon"] = glat, glon
+    np.savez_compressed(tmp / "ar_masks.npz", run=base.strftime("%Y-%m-%dT%HZ"),
+                        valid=np.array([f["valid"] for f in frames]), files=np.array([f["file"] for f in frames]),
+                        algos=np.array(algos), **grids)
 
     # animation GIF de toute la prévision : une par langue et par algorithme
     gifs = {}

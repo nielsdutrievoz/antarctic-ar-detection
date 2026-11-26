@@ -1,0 +1,39 @@
+name: Confirmations d'inscription
+
+# Envoie l'e-mail de confirmation aux nouvelles inscriptions de l'onglet Alerte.
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: confirmations
+  cancel-in-progress: false
+
+jobs:
+  confirm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # seulement les trois fichiers utiles : le dépôt contient des centaines de Mo d'images
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            alert_mail.py
+            algos.py
+            config.yaml
+          sparse-checkout-cone-mode: false
+
+      - name: Envoyer les confirmations
+        env:
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: |
+          if [ -z "$SMTP_PASSWORD" ] || [ -z "$SUPABASE_SECRET_KEY" ]; then
+            echo "Secrets SMTP_PASSWORD / SUPABASE_SECRET_KEY absents : rien à faire."; exit 0
+          fi
+          python3 -c "import yaml" 2>/dev/null || pip install --quiet pyyaml
+          python3 -u alert_mail.py confirm

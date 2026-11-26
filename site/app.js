@@ -172,8 +172,9 @@ const I18N = {
 
 /* ------------------------------------------------------------------ état */
 const $ = (id) => document.getElementById(id);
-/* Onglet Alerte : masqué tant que l'envoi des e-mails n'est pas en service. */
-const ALERT_ENABLED = false;
+/* Onglet Alerte : masqué tant que l'envoi des e-mails n'est pas validé ; visible avec ?alerte=1
+   pour les tests. Les liens des e-mails (confirmation, désinscription) fonctionnent toujours. */
+const ALERT_ENABLED = false || new URLSearchParams(location.search).has("alerte");
 const state = { lang: "fr", tab: "forecast", eventId: null, current: 0, timer: null, algo: null };
 const ALGOS = {
   wille_vivt: { label: "Wille vIVT", color: "#00b8d4" },
@@ -660,7 +661,7 @@ function supa(path, body) {
 async function handleAlertLink() {
   const q = new URLSearchParams(location.search);
   const action = q.has("confirm") ? "confirm" : q.has("unsubscribe") ? "unsubscribe" : null;
-  if (!action || !ALERT_ENABLED) return;
+  if (!action) return;
   const token = q.get(action);
   q.delete(action);
   const url = new URL(location.href);
@@ -669,6 +670,8 @@ async function handleAlertLink() {
   history.replaceState(null, "", url);
   state.tab = "alert";
   render();
+  $("alert-page").hidden = false;
+  $("maps-page").hidden = true;
   const L = I18N[state.lang], box = $("alert-link-msg");
   box.hidden = false;
   box.className = "notice";

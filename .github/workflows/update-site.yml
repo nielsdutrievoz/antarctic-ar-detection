@@ -39,6 +39,20 @@ jobs:
         shell: bash -el {0}
         run: python -u synoptic_maps.py
 
+      # Alertes aux abonnés (inscriptions Supabase). Sans les secrets, l'étape ne fait rien ;
+      # un échec n'empêche pas la mise à jour du site.
+      - name: Alertes par e-mail
+        continue-on-error: true
+        shell: bash -el {0}
+        env:
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: |
+          if [ -z "$SMTP_PASSWORD" ] || [ -z "$SUPABASE_SECRET_KEY" ]; then
+            echo "Secrets SMTP_PASSWORD / SUPABASE_SECRET_KEY absents : pas d'alertes."; exit 0
+          fi
+          python -u alert_mail.py alerts
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
