@@ -5,6 +5,8 @@ on:
     # Toutes les 6 h ; le script prend le dernier run HRES 00/12 UTC complet.
     - cron: "30 2,8,14,20 * * *"
   workflow_dispatch:
+  push:
+    branches: [main]       # republie le site à chaque modification du dépôt
 
 permissions:
   contents: read
