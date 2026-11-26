@@ -128,7 +128,7 @@ def build(cfg: dict, ev: dict, thresholds: xr.Dataset, out_root: Path, workers: 
     gifs = {}
     for l in maprender.LANGS:
         gif = ev_dir / f"{ev['id']}_{l}.gif"
-        maprender.make_gif([str(ev_dir / l / fr["file"]) for fr in frames], str(gif))
+        maprender.make_gif([str(ev_dir / l / fr["file"]) for fr in frames], str(gif), width=720)
         gifs[l] = f"{ev['id']}/{gif.name}"
         print(f"  GIF {l} : {gif.stat().st_size / 1e6:.1f} Mo", flush=True)
 

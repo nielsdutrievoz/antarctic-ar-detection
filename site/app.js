@@ -176,7 +176,9 @@ function render() {
 function renderForecast() {
   $("event-picker").hidden = true;
   $("event-about").hidden = true;
-  $("dl-gif").hidden = true;
+  const gif = forecast && forecast.gif && forecast.gif[state.lang];
+  $("dl-gif").hidden = !gif;
+  if (gif) { $("dl-gif").href = gif; $("dl-gif").setAttribute("download", gif.split("/").pop()); }
   if (!forecast) { $("info").textContent = t("no_data"); view = { frames: [], sites: [] }; return clearViewer(); }
   $("info").textContent = t("run_info")(forecast.model, fmtDate(parseZ(forecast.run), true), forecast.generated.replace("T", " "));
   view = {

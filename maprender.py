@@ -49,6 +49,7 @@ def render(job: dict) -> list[str]:
     warnings.filterwarnings("ignore")
     import matplotlib
     matplotlib.use("Agg")
+    import matplotlib.patheffects as patheffects
     import matplotlib.path as mpath
     import matplotlib.pyplot as plt
     from matplotlib.colors import BoundaryNorm, ListedColormap
@@ -60,7 +61,7 @@ def render(job: dict) -> list[str]:
     d = np.load(job["npz"])
     lat, lon = d["lat"], d["lon"]
     ivt = np.hypot(d["uivt"], d["vivt"])
-    dpi = int(job.get("dpi", 110))
+    dpi = int(job.get("dpi", 150))
 
     fig = plt.figure(figsize=(8, 8.6), dpi=dpi)
     ax = fig.add_axes([0.02, 0.135, 0.96, 0.805], projection=ccrs.SouthPolarStereo())
@@ -105,10 +106,12 @@ def render(job: dict) -> list[str]:
         XA, YA = np.meshgrid(lon_ar, d["ar_lat"])
         ax.contour(XA, YA, ar_c, levels=[0.5], colors="#d4006a", linewidths=2.0, transform=pc)
 
+    halo = [patheffects.withStroke(linewidth=3, foreground="white")]
     for s in job["sites"]:
-        ax.plot(s["lon"], s["lat"], marker="o", ms=4.5, mfc="#00a0b0", mec="k", mew=0.6, transform=pc)
-        ax.text(s["lon"], s["lat"], " " + s["name"], fontsize=7, transform=pc,
-                ha="left", va="center", color="#003a40")
+        ax.plot(s["lon"], s["lat"], marker="o", ms=6, mfc="#00a0b0", mec="#0f1e2e", mew=1.0,
+                transform=pc, zorder=10)
+        ax.text(s["lon"], s["lat"], "  " + s["name"], fontsize=9, fontweight="bold", transform=pc,
+                ha="left", va="center", color="#0f1e2e", path_effects=halo, zorder=11)
 
     gl = ax.gridlines(pc, linewidth=0.3, color="#888888", alpha=0.6, linestyle="--")
     gl.ylocator = matplotlib.ticker.FixedLocator([-80, -70, -60, -50, -40, -30])

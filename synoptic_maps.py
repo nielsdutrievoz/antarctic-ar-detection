@@ -136,6 +136,14 @@ def main(argv=None):
         for f in futures:
             f.result()
 
+    # animation GIF de toute la prévision, une par langue
+    gifs = {}
+    for lang in maprender.LANGS:
+        name = f"ar_forecast_{base:%Y%m%d%H}_{lang}.gif"
+        maprender.make_gif([str(maps / lang / fr["file"]) for fr in frames], str(maps / lang / name), width=720)
+        gifs[lang] = f"maps/{lang}/{name}"
+        print(f"GIF {lang} : {(maps / lang / name).stat().st_size / 1e6:.1f} Mo")
+
     manifest = dict(
         run=base.strftime("%Y-%m-%dT%HZ"),
         generated=dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%MZ"),
@@ -144,6 +152,7 @@ def main(argv=None):
         detection=thresholds is not None,
         sites=[dict(name=s["name"], lat=s["lat"], lon=s["lon"]) for s in cfg["sites"]],
         frames=frames,
+        gif=gifs,
     )
     (out_dir / "data").mkdir(exist_ok=True)
     (out_dir / "data" / "manifest.json").write_text(json.dumps(manifest, indent=1, ensure_ascii=False))

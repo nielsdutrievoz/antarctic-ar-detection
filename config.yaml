@@ -9,7 +9,7 @@ sites:
     lat: -66.66
     lon: 140.00
     radius_km: 100
-  - name: Concordia (Dome C)
+  - name: Concordia
     lat: -75.10
     lon: 123.35
     radius_km: 100
@@ -74,7 +74,7 @@ site:
   step_interval_h: 6
   plot_lat_north: -30.0  # bord nord de la carte polaire
   output_dir: site       # dossier publié sur GitHub Pages
-  dpi: 110               # 8 x 8.6 pouces -> ~880 x 950 px
+  dpi: 150               # 8 x 8.6 pouces -> 1200 x 1290 px
   quiver_every: 8        # un vecteur IVT tous les N points de grille
   render_workers: 4
 
