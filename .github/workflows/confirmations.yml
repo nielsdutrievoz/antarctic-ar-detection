@@ -1,9 +1,11 @@
 name: Confirmations d'inscription
 
 # Envoie l'e-mail de confirmation aux nouvelles inscriptions de l'onglet Alerte.
+# Lancée aussitôt par Supabase à chaque inscription (supabase/webhook.sql) ; la tâche
+# planifiée ne sert que de filet de sécurité.
 on:
   schedule:
-    - cron: "*/10 * * * *"
+    - cron: "*/30 * * * *"
   workflow_dispatch:
 
 permissions:
