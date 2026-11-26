@@ -207,3 +207,7 @@ table.cmp { border-collapse: collapse; width: 100%; font-size: .88rem; min-width
 .cmp thead th { font-family: var(--head); font-weight: 600; white-space: nowrap; }
 .cmp tbody th { font-family: var(--head); font-weight: 400; color: var(--muted); white-space: nowrap; }
 .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--dot); box-shadow: 0 0 0 1.5px #0f1e2e; margin-right: 6px; vertical-align: -1px; }
+
+/* séparation entre la liste des événements et la description */
+.event-picker { margin-bottom: 0; }
+.event-about { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }

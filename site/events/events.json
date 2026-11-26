@@ -4,8 +4,8 @@
   "start": "2018-12-16",
   "end": "2018-12-24",
   "title": {
-   "fr": "Décembre 2018 · Antarctique de l'Est",
-   "en": "December 2018 · East Antarctica"
+   "fr": "Décembre 2018",
+   "en": "December 2018"
   },
   "description": {
    "fr": "Rivière atmosphérique d'origine atlantique, arrivée sur la Terre de Coats (ouest de la Terre de la Reine-Maud) le 17 décembre, puis traversée du plateau jusqu'à Concordia du 19 au 23 décembre. Le 21 décembre, la température à Concordia a atteint −14,7 °C, la deuxième plus élevée depuis 2005. Sur ces cartes, l'algorithme détecte l'AR à son arrivée sur la Terre de Coats (17–19 décembre) ; sa progression sur le plateau, où l'IVT reste faible en valeur absolue, ne remplit plus le critère des 20° de latitude et n'est donc pas contourée.",
@@ -223,8 +223,8 @@
   "start": "2022-02-04",
   "end": "2022-02-11",
   "title": {
-   "fr": "Février 2022 · Péninsule antarctique",
-   "en": "February 2022 · Antarctic Peninsula"
+   "fr": "Février 2022",
+   "en": "February 2022"
   },
   "description": {
    "fr": "Rivière atmosphérique intense guidée vers la Péninsule antarctique par une dépression de la mer d'Amundsen anormale et un anticyclone record à l'est de la Péninsule. Les 7 et 8 février 2022, records absolus de température à King Sejong (13,7 °C), Carlini (13,6 °C), Vernadsky (12,7 °C) et Palmer (11,6 °C), avec une fonte de surface record.",
@@ -408,8 +408,8 @@
   "start": "2022-03-13",
   "end": "2022-03-21",
   "title": {
-   "fr": "Mars 2022 · Antarctique de l'Est",
-   "en": "March 2022 · East Antarctica"
+   "fr": "Mars 2022",
+   "en": "March 2022"
   },
   "description": {
    "fr": "Rivière atmosphérique issue du secteur de l'océan Indien (15–19 mars 2022), à l'origine de la vague de chaleur record sur le plateau de l'Antarctique de l'Est, avec des températures exceptionnelles à Concordia le 18 mars.",
