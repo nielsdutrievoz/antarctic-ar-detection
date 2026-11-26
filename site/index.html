@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rivières atmosphériques Antarctique</title>
+  <meta name="description" content="Situation synoptique autour de l'Antarctique et rivières atmosphériques prévues (ECMWF HRES, détection Wille et al. 2021).">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Rivières atmosphériques · Antarctique</h1>
+    <p id="run" class="muted">Chargement…</p>
+  </header>
+
+  <main>
+    <section class="viewer" aria-label="Cartes de prévision">
+      <div class="controls">
+        <button id="prev" title="Échéance précédente (←)" aria-label="Échéance précédente">‹</button>
+        <button id="play" title="Lecture / pause (espace)" aria-label="Lecture">▶</button>
+        <button id="next" title="Échéance suivante (→)" aria-label="Échéance suivante">›</button>
+        <input id="slider" type="range" min="0" max="0" value="0" aria-label="Échéance">
+        <output id="label" for="slider"></output>
+      </div>
+      <figure>
+        <img id="map" alt="Carte synoptique : IVT, pression au niveau de la mer et rivières atmosphériques">
+      </figure>
+    </section>
+
+    <aside>
+      <section>
+        <h2>AR aux sites</h2>
+        <p class="muted small">Case colorée : un AR est détecté à moins du rayon du site à cette échéance. Clique sur une case pour afficher la carte.</p>
+        <div id="sites"></div>
+      </section>
+      <section>
+        <h2>Lecture des cartes</h2>
+        <ul class="small">
+          <li><b>Couleurs</b> : transport intégré de vapeur d'eau (IVT), kg m<sup>-1</sup> s<sup>-1</sup>. Flèches là où IVT ≥ 250.</li>
+          <li><b>Traits noirs</b> : pression au niveau de la mer, tous les 4 hPa (masquée sur le haut plateau).</li>
+          <li><b>Contour magenta</b> : rivière atmosphérique détectée.</li>
+        </ul>
+        <h2>Méthode</h2>
+        <p class="small" id="method"></p>
+        <p class="small muted">Prévision déterministe ECMWF IFS (HRES, 0.25°), données ouvertes ECMWF sous licence CC-BY-4.0. Détection d'après Wille et al. (2021, <i>JGR Atmospheres</i>) : vIVT poléward supérieur au 98<sup>e</sup> percentile mensuel local (ERA5), objets s'étendant sur au moins 20° de latitude entre 37.5°S et 85°S. Produit expérimental, sans garantie.</p>
+      </section>
+    </aside>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

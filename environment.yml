@@ -1,0 +1,14 @@
+name: ar-alert
+channels: [conda-forge]
+dependencies:
+  - python=3.12
+  - numpy
+  - scipy
+  - xarray
+  - netcdf4
+  - pyyaml
+  - eccodes
+  - python-eccodes
+  - matplotlib-base
+  - cartopy
+  - cdsapi

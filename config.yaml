@@ -1,0 +1,75 @@
+# Configuration du système d'alerte AR (rivières atmosphériques) en Antarctique.
+# Chemins relatifs = relatifs au dossier de ce fichier.
+
+# --- Sites surveillés ---------------------------------------------------------
+# Ajoute autant de sites que tu veux. radius_km = 0 -> point de grille le plus proche ;
+# sinon, un AR est compté si un pixel AR tombe à moins de radius_km du site.
+sites:
+  - name: Dumont d'Urville
+    lat: -66.66
+    lon: 140.00
+    radius_km: 100
+  - name: Concordia (Dome C)
+    lat: -75.10
+    lon: 123.35
+    radius_km: 100
+
+# --- Détection (Wille et al., algorithme v2.4 Antarctique) --------------------
+detection:
+  # vivt : Wille et al. 2021 (q, v sur 8 niveaux + sp : ~6 Mo par membre et par échéance)
+  # iwv  : Wille et al. 2019 (colonne d'eau totale : ~0.4 Mo par membre et par échéance)
+  variable: vivt
+  grid_res: 0.5          # degrés ; grille commune climatologie / prévision
+  lat_north: -37.5       # domaine de détection de Wille v2.4
+  lat_south: -85.0
+  percentile: 98         # seuil climatologique mensuel local
+  min_lat_extent: 20.0   # extension méridienne minimale de la forme AR (degrés)
+
+# --- Climatologie ERA5 (calculée une seule fois, pour la variable choisie) ------
+climatology:
+  first_year: 1991
+  last_year: 2020
+  hours: ["00:00", "06:00", "12:00", "18:00"]
+  download_dir: data/era5            # ~6 Go à 0.5° pour 30 ans (supprimable une fois les seuils calculés)
+  output: data/thresholds_vivt.nc    # seuils 98e percentile, 12 mois (un fichier par variable)
+
+# --- Prévision ECMWF ENS (open data) ------------------------------------------
+forecast:
+  source: ecmwf          # ecmwf | aws | azure | google (mêmes fichiers ; aws limite souvent le débit)
+  max_step_h: 120        # horizon de prévision (h)
+  step_interval_h: 6     # pas de temps (h), multiple de 3 jusqu'à 144 h, de 6 au-delà
+  levels: [1000, 925, 850, 700, 600, 500, 400, 300]   # hPa, pour intégrer le vIVT
+  download_workers: 8    # téléchargements HTTP en parallèle
+  work_dir: data/forecast
+
+# --- Alerte -------------------------------------------------------------------
+alert:
+  probability_threshold: 0.20   # alerte si >= 20 % des membres voient un AR au site
+  min_consecutive_steps: 1      # nombre minimal de pas consécutifs au-dessus du seuil
+  # Après une première alerte, renvoyer un email seulement si la probabilité max
+  # augmente d'au moins cette valeur (évite un email à chaque run).
+  update_if_prob_increase: 0.20
+  state_file: data/state.json
+
+email:
+  enabled: true
+  smtp_host: smtp.example.org   # à remplir (serveur SMTP de ton institut)
+  smtp_port: 587
+  starttls: true
+  username: ""                  # vide = pas d'authentification
+  # Le mot de passe n'est jamais écrit ici. Il est lu dans la variable
+  # d'environnement AR_SMTP_PASSWORD, sinon dans le trousseau macOS
+  # (service "ar-alert-smtp", voir README).
+  from: ""
+  to: []                        # liste de destinataires
+
+# --- Site web (cartes synoptiques ECMWF HRES, synoptic_maps.py) ---------------
+site:
+  source: ecmwf          # serveur de données (voir forecast.source)
+  max_step_h: 120        # horizon des cartes (h)
+  step_interval_h: 6
+  plot_lat_north: -30.0  # bord nord de la carte polaire
+  output_dir: site       # dossier publié sur GitHub Pages
+  dpi: 110               # 8 x 8.6 pouces -> ~880 x 950 px
+  quiver_every: 8        # un vecteur IVT tous les N points de grille
+  render_workers: 4
