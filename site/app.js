@@ -25,6 +25,7 @@ const I18N = {
     legend_title: "Lecture des cartes",
     legend_ivt: "<b>Couleurs</b> : transport intégré de vapeur d'eau (IVT), kg m<sup>-1</sup> s<sup>-1</sup>. Flèches là où IVT ≥ 250.",
     legend_msl: "<b>Traits noirs</b> : pression au niveau de la mer, tous les 4 hPa (masquée sur le haut plateau).",
+    legend_ar_vivt: "<b>Contour cyan</b> : rivière atmosphérique détectée. Le cercle pointillé marque la limite sud de la détection (85°S).",
     legend_ar: "<b>Contour cyan</b> : AR détecté par le transport de vapeur vers le pôle (vIVT, Wille et al. 2021). <b>Contour vert</b> : AR détecté par la vapeur d'eau totale (IWV, Wille et al. 2019), quel que soit le sens du transport. Le cercle pointillé marque la limite sud de la détection (85°S).",
     method_title: "Méthode",
     method_text: "Prévisions : ECMWF IFS déterministe (HRES, 0.25°), données ouvertes ECMWF (CC-BY-4.0). Événements passés : réanalyse ERA5 (Copernicus). Détection d'après Wille et al. (2021, <i>JGR Atmospheres</i>) : vIVT poléward supérieur au 98<sup>e</sup> percentile mensuel local, objets s'étendant sur au moins 20° de latitude entre 37.5°S et 85°S. Produit expérimental, sans garantie.",
@@ -64,6 +65,7 @@ const I18N = {
     legend_title: "Reading the maps",
     legend_ivt: "<b>Colours</b>: integrated water vapour transport (IVT), kg m<sup>-1</sup> s<sup>-1</sup>. Arrows where IVT ≥ 250.",
     legend_msl: "<b>Black lines</b>: mean sea-level pressure every 4 hPa (masked over the high plateau).",
+    legend_ar_vivt: "<b>Cyan contour</b>: detected atmospheric river. The dashed circle marks the southern detection limit (85°S).",
     legend_ar: "<b>Cyan contour</b>: AR detected from poleward vapour transport (vIVT, Wille et al. 2021). <b>Green contour</b>: AR detected from total water vapour (IWV, Wille et al. 2019), whatever the transport direction. The dashed circle marks the southern detection limit (85°S).",
     method_title: "Method",
     method_text: "Forecasts: ECMWF IFS deterministic (HRES, 0.25°), ECMWF open data (CC-BY-4.0). Past events: ERA5 reanalysis (Copernicus). Detection after Wille et al. (2021, <i>JGR Atmospheres</i>): poleward vIVT above the local monthly 98<sup>th</sup> percentile, objects spanning at least 20° of latitude between 37.5°S and 85°S. Experimental product, no warranty.",
@@ -155,6 +157,10 @@ function render() {
   document.title = L.doc_title;
   document.querySelectorAll("[data-i18n]").forEach((el) => (el.textContent = L[el.dataset.i18n]));
   document.querySelectorAll("[data-i18n-html]").forEach((el) => (el.innerHTML = L[el.dataset.i18nHtml]));
+  // la méthode IWV n'est décrite que si ses seuils sont en service
+  const iwv = !!(forecast && forecast.detection_iwv);
+  document.querySelectorAll(".iwv-only").forEach((el) => (el.hidden = !iwv));
+  document.querySelector('[data-i18n-html="legend_ar"]').innerHTML = iwv ? L.legend_ar : L.legend_ar_vivt;
   document.querySelectorAll("[data-lang]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.lang === state.lang));
   document.querySelectorAll("[data-tab]").forEach((b) => b.setAttribute("aria-selected", b.dataset.tab === state.tab));
   $("prev").setAttribute("aria-label", L.prev);
