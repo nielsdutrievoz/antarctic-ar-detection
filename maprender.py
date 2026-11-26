@@ -15,15 +15,15 @@ import numpy as np
 LANGS = ("fr", "en")
 TEXT = {
     "fr": dict(title="IVT, pression au niveau de la mer et rivières atmosphériques",
-               ar="Contour magenta : rivière atmosphérique",
+               ar="Contour cyan : rivière atmosphérique",
                algo="Détection AR : Wille et al. (2021), JGR Atmospheres, doi:10.1029/2020JD033788 · vIVT > 98e percentile mensuel ERA5, ≥ 20° de latitude",
                no_ar="Seuils ERA5 non disponibles : pas de détection d'AR",
-               isobars="Isobares 4 hPa, masquées si p$_s$ < 800 hPa"),
+               isobars="Isobares 4 hPa, masquées si p$_s$ < 800 hPa · pointillés : limite de détection 85°S"),
     "en": dict(title="IVT, mean sea-level pressure and atmospheric rivers",
-               ar="Magenta contour: atmospheric river",
+               ar="Cyan contour: atmospheric river",
                algo="AR detection: Wille et al. (2021), JGR Atmospheres, doi:10.1029/2020JD033788 · vIVT > monthly ERA5 98th percentile, ≥ 20° latitude",
                no_ar="ERA5 thresholds not available: no AR detection",
-               isobars="Isobars every 4 hPa, masked where p$_s$ < 800 hPa"),
+               isobars="Isobars every 4 hPa, masked where p$_s$ < 800 hPa · dashed: 85°S detection limit"),
 }
 DAYS = {"fr": ["lun.", "mar.", "mer.", "jeu.", "ven.", "sam.", "dim."],
         "en": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]}
@@ -102,13 +102,28 @@ def render(job: dict) -> list[str]:
                   scale=12000, width=0.0018, color="#202020", alpha=0.75)
 
     if "ar" in d.files and d["ar"].any():
-        ar_c, lon_ar = add_cyclic_point(d["ar"].astype(float), coord=d["ar_lon"])
-        XA, YA = np.meshgrid(lon_ar, d["ar_lat"])
-        ax.contour(XA, YA, ar_c, levels=[0.5], colors="#d4006a", linewidths=2.0, transform=pc)
+        # Le masque s'arrête aux bords du domaine de détection (37.5°S et 85°S) : on l'entoure
+        # d'une rangée de zéros pour que le contour se referme au lieu de s'interrompre au bord.
+        ar = d["ar"].astype(float)
+        ar_lat = d["ar_lat"]
+        dl = ar_lat[1] - ar_lat[0]
+        ar = np.vstack([np.zeros((1, ar.shape[1])), ar, np.zeros((1, ar.shape[1]))])
+        ar_lat = np.concatenate([[ar_lat[0] - dl], ar_lat, [ar_lat[-1] + dl]])
+        ar_c, lon_ar = add_cyclic_point(ar, coord=d["ar_lon"])
+        XA, YA = np.meshgrid(lon_ar, ar_lat)
+        # cyan vif cerclé de noir : se détache sur toute la palette jaune-orange-violet de l'IVT
+        cs_ar = ax.contour(XA, YA, ar_c, levels=[0.5], colors="#00e5ff", linewidths=2.4,
+                           transform=pc, zorder=8)
+        cs_ar.set(path_effects=[patheffects.withStroke(linewidth=4.8, foreground="#0f1e2e")])
+    if job.get("has_thr"):
+        # limite sud de la détection (85°S) : les AR y sont coupés
+        ring = np.linspace(0, 360, 361)
+        ax.plot(ring, np.full_like(ring, -85.0), transform=pc, color="#3a3a3a", lw=0.9,
+                ls=(0, (4, 3)), zorder=7)
 
     halo = [patheffects.withStroke(linewidth=3, foreground="white")]
     for s in job["sites"]:
-        ax.plot(s["lon"], s["lat"], marker="o", ms=6, mfc="#00a0b0", mec="#0f1e2e", mew=1.0,
+        ax.plot(s["lon"], s["lat"], marker="o", ms=6.5, mfc="white", mec="#0f1e2e", mew=1.6,
                 transform=pc, zorder=10)
         ax.text(s["lon"], s["lat"], "  " + s["name"], fontsize=9, fontweight="bold", transform=pc,
                 ha="left", va="center", color="#0f1e2e", path_effects=halo, zorder=11)

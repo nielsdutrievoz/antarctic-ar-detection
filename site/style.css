@@ -11,8 +11,9 @@
   --shadow: 0 6px 24px rgba(15, 30, 46, .06);
   --head: "Sora", system-ui, sans-serif;
   --body: "Source Sans 3", system-ui, sans-serif;
-  --ar: #d4006a;            /* même magenta que les contours AR des cartes */
-  --ar-soft: #fbe3ef;
+  --ar: #00b8d4;            /* cyan, comme les contours AR des cartes */
+  --ar-soft: #d9f7fc;
+  --ar-ink: #00586a;
 }
 * { box-sizing: border-box; }
 body {
@@ -147,7 +148,7 @@ figure { margin: 0; }
 .axis { display: flex; justify-content: space-between; font-size: .75rem; color: var(--muted); margin-top: 3px; }
 .badge {
   font-size: .78rem; padding: 0 9px; border-radius: 999px; white-space: nowrap;
-  background: var(--ar-soft); color: var(--ar); font-weight: 600;
+  background: var(--ar-soft); color: var(--ar-ink); font-weight: 600;
 }
 
 .site-footer { text-align: center; padding: 60px 16px 40px; color: var(--muted); }
