@@ -5,7 +5,7 @@ const I18N = {
   fr: {
     title: "Rivières atmosphériques en Antarctique",
     doc_title: "Rivières atmosphériques Antarctique | Niels Dutrievoz",
-    back: "← Site principal",
+    back: "Accueil",
     home: "/fr/",
     eyebrow: "Outil de suivi · prévision ECMWF",
     lead: "Situation synoptique autour de l'Antarctique et rivières atmosphériques prévues pour les cinq prochains jours, mise à jour quatre fois par jour, et retour sur des événements passés.",
@@ -96,7 +96,7 @@ const I18N = {
   en: {
     title: "Atmospheric rivers in Antarctica",
     doc_title: "Antarctic atmospheric rivers | Niels Dutrievoz",
-    back: "← Main site",
+    back: "Home",
     home: "/",
     eyebrow: "Monitoring tool · ECMWF forecast",
     lead: "Synoptic situation around Antarctica and atmospheric rivers forecast for the next five days, updated four times a day, plus a look back at past events.",
@@ -191,6 +191,7 @@ const $ = (id) => document.getElementById(id);
 /* Onglet Alerte : interrupteur général (false = onglet masqué ; les liens des e-mails
    de confirmation et de désinscription fonctionnent toujours). */
 const ALERT_ENABLED = true;
+const SITE_HOME = "https://nielsdutrievoz.github.io/antarctic-ar-detection/";   // bouton « Accueil »
 const state = { lang: "fr", tab: "forecast", eventId: null, current: 0, timer: null, algo: null };
 const ALGOS = {
   wille_vivt: { label: "Wille vIVT", color: "#00b8d4" },
@@ -286,7 +287,7 @@ function render() {
   $("map").alt = L.map_alt;
   $("home-link").href = L.home;
   $("contact-mail").href = `mailto:${["niels", "dutrievoz.eu"].join("@")}?subject=${encodeURIComponent(L.contact_subject)}`;
-  $("back-link").href = L.home;
+  $("back-link").href = `${SITE_HOME}?lang=${state.lang}`;
   $("method").textContent = forecast && (forecast.algorithms || []).length ? L.detection_on(forecast.period) : (forecast ? L.detection_off : "");
 
   document.querySelectorAll("[data-only]").forEach((el) => (el.hidden = el.dataset.only !== state.lang));
