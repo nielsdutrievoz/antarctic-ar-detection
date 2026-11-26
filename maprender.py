@@ -16,12 +16,12 @@ LANGS = ("fr", "en")
 TEXT = {
     "fr": dict(title="IVT, pression au niveau de la mer et rivières atmosphériques",
                ar="Contour magenta : rivière atmosphérique",
-               algo="Détection AR : Wille et al. (2021), J. Geophys. Res. Atmos. 126, e2020JD033788, doi:10.1029/2020JD033788 (vIVT > 98e percentile mensuel ERA5, ≥ 20° de latitude)",
+               algo="Détection AR : Wille et al. (2021), JGR Atmospheres, doi:10.1029/2020JD033788 · vIVT > 98e percentile mensuel ERA5, ≥ 20° de latitude",
                no_ar="Seuils ERA5 non disponibles : pas de détection d'AR",
                isobars="Isobares 4 hPa, masquées si p$_s$ < 800 hPa"),
     "en": dict(title="IVT, mean sea-level pressure and atmospheric rivers",
                ar="Magenta contour: atmospheric river",
-               algo="AR detection: Wille et al. (2021), J. Geophys. Res. Atmos. 126, e2020JD033788, doi:10.1029/2020JD033788 (vIVT > monthly ERA5 98th percentile, ≥ 20° latitude)",
+               algo="AR detection: Wille et al. (2021), JGR Atmospheres, doi:10.1029/2020JD033788 · vIVT > monthly ERA5 98th percentile, ≥ 20° latitude",
                no_ar="ERA5 thresholds not available: no AR detection",
                isobars="Isobars every 4 hPa, masked where p$_s$ < 800 hPa"),
 }

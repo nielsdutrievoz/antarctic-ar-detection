@@ -1,0 +1,638 @@
+[
+ {
+  "id": "2018-12-concordia",
+  "start": "2018-12-16",
+  "end": "2018-12-24",
+  "title": {
+   "fr": "Décembre 2018 : rivière atmosphérique atlantique jusqu'à Concordia",
+   "en": "December 2018: Atlantic atmospheric river reaching Concordia"
+  },
+  "description": {
+   "fr": "Rivière atmosphérique d'origine atlantique, arrivée sur la Terre de Coats (ouest de la Terre de la Reine-Maud) le 17 décembre, puis traversée du plateau jusqu'à Concordia du 19 au 23 décembre. Le 21 décembre, la température à Concordia a atteint −14,7 °C, la deuxième plus élevée depuis 2005. Sur ces cartes, l'algorithme détecte l'AR à son arrivée sur la Terre de Coats (17–19 décembre) ; sa progression sur le plateau, où l'IVT reste faible en valeur absolue, ne remplit plus le critère des 20° de latitude et n'est donc pas contourée.",
+   "en": "Atlantic-sourced atmospheric river that made landfall over Coats Land (western Dronning Maud Land) on 17 December, then crossed the plateau to Concordia from 19 to 23 December. On 21 December the temperature at Concordia reached −14.7 °C, the second highest since 2005. On these maps the algorithm detects the AR at landfall over Coats Land (17–19 December); its progression over the plateau, where IVT remains low in absolute terms, no longer meets the 20°-latitude criterion and is therefore not contoured."
+  },
+  "reference": {
+   "text": "Dutrievoz et al. (2026), The Cryosphere 20, 1025–1046",
+   "url": "https://doi.org/10.5194/tc-20-1025-2026"
+  },
+  "frames": [
+   {
+    "time": "2018-12-16T00:00Z",
+    "file": "20181216_00.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-16T06:00Z",
+    "file": "20181216_06.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-16T12:00Z",
+    "file": "20181216_12.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-16T18:00Z",
+    "file": "20181216_18.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-17T00:00Z",
+    "file": "20181217_00.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-17T06:00Z",
+    "file": "20181217_06.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-17T12:00Z",
+    "file": "20181217_12.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-17T18:00Z",
+    "file": "20181217_18.png",
+    "ar_sites": [
+     "Neumayer III"
+    ]
+   },
+   {
+    "time": "2018-12-18T00:00Z",
+    "file": "20181218_00.png",
+    "ar_sites": [
+     "Neumayer III"
+    ]
+   },
+   {
+    "time": "2018-12-18T06:00Z",
+    "file": "20181218_06.png",
+    "ar_sites": [
+     "Neumayer III"
+    ]
+   },
+   {
+    "time": "2018-12-18T12:00Z",
+    "file": "20181218_12.png",
+    "ar_sites": [
+     "Neumayer III"
+    ]
+   },
+   {
+    "time": "2018-12-18T18:00Z",
+    "file": "20181218_18.png",
+    "ar_sites": [
+     "Neumayer III"
+    ]
+   },
+   {
+    "time": "2018-12-19T00:00Z",
+    "file": "20181219_00.png",
+    "ar_sites": [
+     "Neumayer III"
+    ]
+   },
+   {
+    "time": "2018-12-19T06:00Z",
+    "file": "20181219_06.png",
+    "ar_sites": [
+     "Neumayer III"
+    ]
+   },
+   {
+    "time": "2018-12-19T12:00Z",
+    "file": "20181219_12.png",
+    "ar_sites": [
+     "Neumayer III"
+    ]
+   },
+   {
+    "time": "2018-12-19T18:00Z",
+    "file": "20181219_18.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-20T00:00Z",
+    "file": "20181220_00.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-20T06:00Z",
+    "file": "20181220_06.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-20T12:00Z",
+    "file": "20181220_12.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-20T18:00Z",
+    "file": "20181220_18.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-21T00:00Z",
+    "file": "20181221_00.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-21T06:00Z",
+    "file": "20181221_06.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-21T12:00Z",
+    "file": "20181221_12.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-21T18:00Z",
+    "file": "20181221_18.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-22T00:00Z",
+    "file": "20181222_00.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-22T06:00Z",
+    "file": "20181222_06.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-22T12:00Z",
+    "file": "20181222_12.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-22T18:00Z",
+    "file": "20181222_18.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-23T00:00Z",
+    "file": "20181223_00.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-23T06:00Z",
+    "file": "20181223_06.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-23T12:00Z",
+    "file": "20181223_12.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-23T18:00Z",
+    "file": "20181223_18.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-24T00:00Z",
+    "file": "20181224_00.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-24T06:00Z",
+    "file": "20181224_06.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-24T12:00Z",
+    "file": "20181224_12.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2018-12-24T18:00Z",
+    "file": "20181224_18.png",
+    "ar_sites": []
+   }
+  ],
+  "gif": {
+   "fr": "2018-12-concordia/2018-12-concordia_fr.gif",
+   "en": "2018-12-concordia/2018-12-concordia_en.gif"
+  }
+ },
+ {
+  "id": "2022-02-peninsula",
+  "start": "2022-02-04",
+  "end": "2022-02-11",
+  "title": {
+   "fr": "Février 2022 : AR intense et records de chaleur sur la Péninsule",
+   "en": "February 2022: intense AR and record heat on the Peninsula"
+  },
+  "description": {
+   "fr": "Rivière atmosphérique intense guidée vers la Péninsule antarctique par une dépression de la mer d'Amundsen anormale et un anticyclone record à l'est de la Péninsule. Les 7 et 8 février 2022, records absolus de température à King Sejong (13,7 °C), Carlini (13,6 °C), Vernadsky (12,7 °C) et Palmer (11,6 °C), avec une fonte de surface record.",
+   "en": "Intense atmospheric river steered towards the Antarctic Peninsula by an anomalous Amundsen Sea Low and a record-breaking high-pressure system east of the Peninsula. On 7–8 February 2022, all-time temperature records at King Sejong (13.7 °C), Carlini (13.6 °C), Vernadsky (12.7 °C) and Palmer (11.6 °C), with record surface melt."
+  },
+  "reference": {
+   "text": "Gorodetskaya et al. (2023), npj Climate and Atmospheric Science 6, 202",
+   "url": "https://doi.org/10.1038/s41612-023-00529-6"
+  },
+  "frames": [
+   {
+    "time": "2022-02-04T00:00Z",
+    "file": "20220204_00.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-04T06:00Z",
+    "file": "20220204_06.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-04T12:00Z",
+    "file": "20220204_12.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-04T18:00Z",
+    "file": "20220204_18.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-05T00:00Z",
+    "file": "20220205_00.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-05T06:00Z",
+    "file": "20220205_06.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-05T12:00Z",
+    "file": "20220205_12.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-05T18:00Z",
+    "file": "20220205_18.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-06T00:00Z",
+    "file": "20220206_00.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-06T06:00Z",
+    "file": "20220206_06.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-06T12:00Z",
+    "file": "20220206_12.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-06T18:00Z",
+    "file": "20220206_18.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-07T00:00Z",
+    "file": "20220207_00.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-07T06:00Z",
+    "file": "20220207_06.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-07T12:00Z",
+    "file": "20220207_12.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-07T18:00Z",
+    "file": "20220207_18.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-08T00:00Z",
+    "file": "20220208_00.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-08T06:00Z",
+    "file": "20220208_06.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-08T12:00Z",
+    "file": "20220208_12.png",
+    "ar_sites": [
+     "Dumont d'Urville"
+    ]
+   },
+   {
+    "time": "2022-02-08T18:00Z",
+    "file": "20220208_18.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-09T00:00Z",
+    "file": "20220209_00.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-09T06:00Z",
+    "file": "20220209_06.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-09T12:00Z",
+    "file": "20220209_12.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-09T18:00Z",
+    "file": "20220209_18.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-10T00:00Z",
+    "file": "20220210_00.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-10T06:00Z",
+    "file": "20220210_06.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-10T12:00Z",
+    "file": "20220210_12.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-10T18:00Z",
+    "file": "20220210_18.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-11T00:00Z",
+    "file": "20220211_00.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-11T06:00Z",
+    "file": "20220211_06.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-11T12:00Z",
+    "file": "20220211_12.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-02-11T18:00Z",
+    "file": "20220211_18.png",
+    "ar_sites": []
+   }
+  ],
+  "gif": {
+   "fr": "2022-02-peninsula/2022-02-peninsula_fr.gif",
+   "en": "2022-02-peninsula/2022-02-peninsula_en.gif"
+  }
+ },
+ {
+  "id": "2022-03-east-antarctica",
+  "start": "2022-03-13",
+  "end": "2022-03-21",
+  "title": {
+   "fr": "Mars 2022 : vague de chaleur en Antarctique de l'Est",
+   "en": "March 2022: East Antarctic heatwave"
+  },
+  "description": {
+   "fr": "Rivière atmosphérique issue du secteur de l'océan Indien (15–19 mars 2022), à l'origine de la vague de chaleur record sur le plateau de l'Antarctique de l'Est, avec des températures exceptionnelles à Concordia le 18 mars.",
+   "en": "Atmospheric river from the Indian Ocean sector (15–19 March 2022) that drove the record-breaking heatwave over the East Antarctic plateau, with exceptional temperatures at Concordia on 18 March."
+  },
+  "reference": {
+   "text": "Wille et al. (2024), Journal of Climate 37, 757–778",
+   "url": "https://doi.org/10.1175/JCLI-D-23-0175.1"
+  },
+  "frames": [
+   {
+    "time": "2022-03-13T00:00Z",
+    "file": "20220313_00.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-03-13T06:00Z",
+    "file": "20220313_06.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-03-13T12:00Z",
+    "file": "20220313_12.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-03-13T18:00Z",
+    "file": "20220313_18.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-03-14T00:00Z",
+    "file": "20220314_00.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-03-14T06:00Z",
+    "file": "20220314_06.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-03-14T12:00Z",
+    "file": "20220314_12.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-03-14T18:00Z",
+    "file": "20220314_18.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-03-15T00:00Z",
+    "file": "20220315_00.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-03-15T06:00Z",
+    "file": "20220315_06.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-03-15T12:00Z",
+    "file": "20220315_12.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-03-15T18:00Z",
+    "file": "20220315_18.png",
+    "ar_sites": [
+     "Dumont d'Urville"
+    ]
+   },
+   {
+    "time": "2022-03-16T00:00Z",
+    "file": "20220316_00.png",
+    "ar_sites": [
+     "Dumont d'Urville",
+     "Concordia"
+    ]
+   },
+   {
+    "time": "2022-03-16T06:00Z",
+    "file": "20220316_06.png",
+    "ar_sites": [
+     "Concordia"
+    ]
+   },
+   {
+    "time": "2022-03-16T12:00Z",
+    "file": "20220316_12.png",
+    "ar_sites": [
+     "Concordia"
+    ]
+   },
+   {
+    "time": "2022-03-16T18:00Z",
+    "file": "20220316_18.png",
+    "ar_sites": [
+     "Dumont d'Urville",
+     "Concordia"
+    ]
+   },
+   {
+    "time": "2022-03-17T00:00Z",
+    "file": "20220317_00.png",
+    "ar_sites": [
+     "Dumont d'Urville",
+     "Concordia"
+    ]
+   },
+   {
+    "time": "2022-03-17T06:00Z",
+    "file": "20220317_06.png",
+    "ar_sites": [
+     "Dumont d'Urville",
+     "Concordia"
+    ]
+   },
+   {
+    "time": "2022-03-17T12:00Z",
+    "file": "20220317_12.png",
+    "ar_sites": [
+     "Dumont d'Urville",
+     "Concordia"
+    ]
+   },
+   {
+    "time": "2022-03-17T18:00Z",
+    "file": "20220317_18.png",
+    "ar_sites": [
+     "Dumont d'Urville",
+     "Concordia"
+    ]
+   },
+   {
+    "time": "2022-03-18T00:00Z",
+    "file": "20220318_00.png",
+    "ar_sites": [
+     "Dumont d'Urville",
+     "Concordia"
+    ]
+   },
+   {
+    "time": "2022-03-18T06:00Z",
+    "file": "20220318_06.png",
+    "ar_sites": [
+     "Concordia"
+    ]
+   },
+   {
+    "time": "2022-03-18T12:00Z",
+    "file": "20220318_12.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-03-18T18:00Z",
+    "file": "20220318_18.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-03-19T00:00Z",
+    "file": "20220319_00.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-03-19T06:00Z",
+    "file": "20220319_06.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-03-19T12:00Z",
+    "file": "20220319_12.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-03-19T18:00Z",
+    "file": "20220319_18.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-03-20T00:00Z",
+    "file": "20220320_00.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-03-20T06:00Z",
+    "file": "20220320_06.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-03-20T12:00Z",
+    "file": "20220320_12.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-03-20T18:00Z",
+    "file": "20220320_18.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-03-21T00:00Z",
+    "file": "20220321_00.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-03-21T06:00Z",
+    "file": "20220321_06.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-03-21T12:00Z",
+    "file": "20220321_12.png",
+    "ar_sites": []
+   },
+   {
+    "time": "2022-03-21T18:00Z",
+    "file": "20220321_18.png",
+    "ar_sites": []
+   }
+  ],
+  "gif": {
+   "fr": "2022-03-east-antarctica/2022-03-east-antarctica_fr.gif",
+   "en": "2022-03-east-antarctica/2022-03-east-antarctica_en.gif"
+  }
+ }
+]
