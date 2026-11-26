@@ -3,8 +3,16 @@
 /* ------------------------------------------------------------------ textes */
 const I18N = {
   fr: {
-    title: "Rivières atmosphériques · Antarctique",
-    doc_title: "Rivières atmosphériques Antarctique",
+    title: "Rivières atmosphériques en Antarctique",
+    doc_title: "Rivières atmosphériques Antarctique | Niels Dutrievoz",
+    back: "← Site principal",
+    home: "/fr/",
+    eyebrow: "Outil de suivi · prévision ECMWF",
+    lead: "Situation synoptique autour de l'Antarctique et rivières atmosphériques prévues pour les cinq prochains jours, mise à jour quatre fois par jour, et retour sur des événements passés.",
+    event_label: "Événement",
+    sites_label: "Stations",
+    legend_label: "Légende",
+    footer: "Niels Dutrievoz · Données ECMWF (CC-BY-4.0) et Copernicus ERA5 · <a href=\"https://github.com/nielsdutrievoz/antarctic-ar-detection\">Code source</a>",
     tab_forecast: "Prévision",
     tab_events: "Événements passés",
     download_image: "Télécharger l'image",
@@ -31,8 +39,16 @@ const I18N = {
     reference: "Référence :",
   },
   en: {
-    title: "Atmospheric rivers · Antarctica",
-    doc_title: "Antarctic atmospheric rivers",
+    title: "Atmospheric rivers in Antarctica",
+    doc_title: "Antarctic atmospheric rivers | Niels Dutrievoz",
+    back: "← Main site",
+    home: "/",
+    eyebrow: "Monitoring tool · ECMWF forecast",
+    lead: "Synoptic situation around Antarctica and atmospheric rivers forecast for the next five days, updated four times a day, plus a look back at past events.",
+    event_label: "Event",
+    sites_label: "Stations",
+    legend_label: "Legend",
+    footer: "Niels Dutrievoz · Data: ECMWF (CC-BY-4.0) and Copernicus ERA5 · <a href=\"https://github.com/nielsdutrievoz/antarctic-ar-detection\">Source code</a>",
     tab_forecast: "Forecast",
     tab_events: "Past events",
     download_image: "Download image",
@@ -135,6 +151,8 @@ function render() {
   $("prev").setAttribute("aria-label", L.prev);
   $("next").setAttribute("aria-label", L.next);
   $("map").alt = L.map_alt;
+  $("home-link").href = L.home;
+  $("back-link").href = L.home;
   $("method").textContent = forecast && forecast.detection ? L.detection_on(forecast.period) : (forecast ? L.detection_off : "");
 
   if (state.tab === "forecast") renderForecast(); else renderEvents();
