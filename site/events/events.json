@@ -519,7 +519,9 @@
     "time": "2022-02-05T12:00Z",
     "file": "20220205_12.png",
     "ar": {
-     "wille_vivt": [],
+     "wille_vivt": [
+      "Vernadsky"
+     ],
      "wille_iwv": [],
      "dark": []
     }
@@ -528,9 +530,13 @@
     "time": "2022-02-05T18:00Z",
     "file": "20220205_18.png",
     "ar": {
-     "wille_vivt": [],
+     "wille_vivt": [
+      "Vernadsky"
+     ],
      "wille_iwv": [],
-     "dark": []
+     "dark": [
+      "Vernadsky"
+     ]
     }
    },
    {
@@ -582,45 +588,75 @@
     "time": "2022-02-07T06:00Z",
     "file": "20220207_06.png",
     "ar": {
-     "wille_vivt": [],
-     "wille_iwv": [],
-     "dark": []
+     "wille_vivt": [
+      "Vernadsky"
+     ],
+     "wille_iwv": [
+      "Vernadsky"
+     ],
+     "dark": [
+      "Vernadsky"
+     ]
     }
    },
    {
     "time": "2022-02-07T12:00Z",
     "file": "20220207_12.png",
     "ar": {
-     "wille_vivt": [],
-     "wille_iwv": [],
-     "dark": []
+     "wille_vivt": [
+      "Vernadsky"
+     ],
+     "wille_iwv": [
+      "Vernadsky"
+     ],
+     "dark": [
+      "Vernadsky"
+     ]
     }
    },
    {
     "time": "2022-02-07T18:00Z",
     "file": "20220207_18.png",
     "ar": {
-     "wille_vivt": [],
-     "wille_iwv": [],
-     "dark": []
+     "wille_vivt": [
+      "Vernadsky"
+     ],
+     "wille_iwv": [
+      "Vernadsky"
+     ],
+     "dark": [
+      "Vernadsky"
+     ]
     }
    },
    {
     "time": "2022-02-08T00:00Z",
     "file": "20220208_00.png",
     "ar": {
-     "wille_vivt": [],
-     "wille_iwv": [],
-     "dark": []
+     "wille_vivt": [
+      "Vernadsky"
+     ],
+     "wille_iwv": [
+      "Vernadsky"
+     ],
+     "dark": [
+      "Vernadsky"
+     ]
     }
    },
    {
     "time": "2022-02-08T06:00Z",
     "file": "20220208_06.png",
     "ar": {
-     "wille_vivt": [],
-     "wille_iwv": [],
-     "dark": []
+     "wille_vivt": [
+      "Vernadsky"
+     ],
+     "wille_iwv": [
+      "Vernadsky"
+     ],
+     "dark": [
+      "Vernadsky"
+     ]
     }
    },
    {
@@ -628,28 +664,45 @@
     "file": "20220208_12.png",
     "ar": {
      "wille_vivt": [
-      "Dumont d'Urville"
+      "Dumont d'Urville",
+      "Vernadsky"
      ],
-     "wille_iwv": [],
-     "dark": []
+     "wille_iwv": [
+      "Vernadsky"
+     ],
+     "dark": [
+      "Vernadsky"
+     ]
     }
    },
    {
     "time": "2022-02-08T18:00Z",
     "file": "20220208_18.png",
     "ar": {
-     "wille_vivt": [],
-     "wille_iwv": [],
-     "dark": []
+     "wille_vivt": [
+      "Vernadsky"
+     ],
+     "wille_iwv": [
+      "Vernadsky"
+     ],
+     "dark": [
+      "Vernadsky"
+     ]
     }
    },
    {
     "time": "2022-02-09T00:00Z",
     "file": "20220209_00.png",
     "ar": {
-     "wille_vivt": [],
-     "wille_iwv": [],
-     "dark": []
+     "wille_vivt": [
+      "Vernadsky"
+     ],
+     "wille_iwv": [
+      "Vernadsky"
+     ],
+     "dark": [
+      "Vernadsky"
+     ]
     }
    },
    {
