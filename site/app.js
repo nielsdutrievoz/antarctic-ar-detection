@@ -37,6 +37,8 @@ const I18N = {
     f_radius: "Ajoute un ou plusieurs lieux (10 au maximum). Un AR est signalé s'il passe à moins de 100 km de l'un d'eux.",
     f_algos: "Algorithme(s)",
     f_lang: "Langue des e-mails",
+    f_remind_legend: "Rappel",
+    f_remind: "M'envoyer aussi un rappel environ 24 h avant l'arrivée de l'AR (en plus de l'alerte envoyée dès qu'il est prévu).",
     f_consent: "J'accepte que mon adresse e-mail et les lieux choisis soient conservés uniquement pour l'envoi de ces alertes. Je peux me désinscrire à tout moment via le lien présent dans chaque e-mail.",
     f_submit: "S'inscrire à l'alerte",
     alert_where: "Lieux choisis",
@@ -45,7 +47,7 @@ const I18N = {
       "Après l'inscription, un e-mail de confirmation t'est envoyé : l'alerte n'est active qu'une fois le lien cliqué.",
       "À chaque nouvelle prévision (00 et 12 UTC), les algorithmes choisis sont appliqués au lieu surveillé.",
       "Un e-mail est envoyé quand un nouvel AR y est prévu : date d'arrivée, algorithme(s), animation de la situation synoptique et lien vers le site.",
-      "Pas de nouvel e-mail tant que le même AR reste prévu.",
+      "Pas de nouvel e-mail tant que le même AR reste prévu, sauf le rappel environ 24 h avant son arrivée si tu l'as demandé.",
       "Produit expérimental de recherche, sans garantie : ne pas utiliser pour la sécurité des opérations de terrain.",
     ],
     err_email: "Adresse e-mail invalide.",
@@ -129,6 +131,8 @@ const I18N = {
     f_radius: "Add one or more locations (up to 10). An AR is reported when it passes within 100 km of any of them.",
     f_algos: "Algorithm(s)",
     f_lang: "Email language",
+    f_remind_legend: "Reminder",
+    f_remind: "Also send me a reminder about 24 h before the AR arrives (in addition to the alert sent as soon as it is forecast).",
     f_consent: "I agree that my email address and the chosen locations are stored only to send these alerts. I can unsubscribe at any time through the link in every email.",
     f_submit: "Subscribe to the alert",
     alert_where: "Selected locations",
@@ -137,7 +141,7 @@ const I18N = {
       "After subscribing, you receive a confirmation email: the alert is only active once you click its link.",
       "With each new forecast (00 and 12 UTC), the selected algorithms are applied at your location.",
       "An email is sent when a new AR is forecast there: arrival time, algorithm(s), synoptic animation and a link to the site.",
-      "No new email while the same AR remains forecast.",
+      "No new email while the same AR remains forecast, except the reminder about 24 h before arrival if you asked for it.",
       "Experimental research product, no warranty: do not use for field-operation safety.",
     ],
     err_email: "Invalid email address.",
@@ -721,6 +725,7 @@ async function submitAlert(e) {
   const subs = places.map((p) => ({
     email, station: p.name, lat: +p.lat.toFixed(2), lon: +p.lon.toFixed(2),
     algorithms: [...alertState.algos], lang: alertState.lang,
+    ...($("a-remind").checked ? { remind_24h: true } : {}),
   }));
   if ($("a-website").value) return;          // champ piège : rempli seulement par les robots
   if (!SUPABASE_URL) {

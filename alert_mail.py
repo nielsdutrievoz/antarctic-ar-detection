@@ -3,7 +3,8 @@
   python alert_mail.py confirm               envoie l'e-mail de confirmation aux nouvelles inscriptions
   python alert_mail.py alerts                après synoptic_maps.py : alerte les abonnés quand un AR
                                              est prévu à leur lieu
-  python alert_mail.py test --to ADRESSE     envoie un exemple d'alerte (sans toucher à Supabase)
+  python alert_mail.py test --to ADRESSE     envoie un exemple d'alerte (sans toucher à Supabase) ;
+                                             --reminder : exemple d'e-mail de rappel 24 h avant
 
 Options : --dry-run écrit les messages dans data/outbox/*.eml au lieu de les envoyer et ne modifie
 pas Supabase.
@@ -158,6 +159,11 @@ TXT = {
         footer="Produit expérimental de recherche, sans garantie : ne pas utiliser pour la sécurité des opérations "
                "de terrain. Tu reçois cet e-mail car tu t'es inscrit aux alertes AR pour ce lieu.",
         unsubscribe="Se désinscrire",
+        remind_tag="rappel 24 h avant l'arrivée",
+        remind_subject="Rappel : AR attendu à {place} vers le {start}",
+        remind_title="Rappel : AR attendu à {place}",
+        remind_intro="Rappel : d'après la prévision ECMWF HRES du run du {run}, l'AR annoncé doit arriver à "
+                     "moins de {radius} km de <b>{place}</b> ({coords}) dans environ {hours} h.",
     ),
     "en": dict(
         confirm_subject="Confirm your AR alert for {place}",
@@ -179,6 +185,11 @@ TXT = {
         footer="Experimental research product, no warranty: do not use for field-operation safety. "
                "You receive this email because you subscribed to AR alerts for this location.",
         unsubscribe="Unsubscribe",
+        remind_tag="reminder 24 h before arrival",
+        remind_subject="Reminder: AR expected at {place} around {start}",
+        remind_title="Reminder: AR expected at {place}",
+        remind_intro="Reminder: according to the ECMWF HRES forecast from the {run} run, the announced AR "
+                     "should reach within {radius} km of <b>{place}</b> ({coords}) in about {hours} h.",
     ),
 }
 
@@ -216,6 +227,8 @@ def confirmation_message(mailer: Mailer, mc: dict, subs: list[dict]) -> EmailMes
     for x in subs:
         algos = ", ".join(ALGOS[a]["label"] for a in ORDER if a in x["algorithms"])
         name = f"<b>{html.escape(x['station'])}</b> ({coords(x)})" if x.get("station") else f"<b>{coords(x)}</b>"
+        if x.get("remind_24h"):
+            algos += f" · {T['remind_tag']}"
         items.append((name, algos))
     body = T["confirm_body"].format(radius=mc["radius_km"])
     lst = "".join(f"<li style='margin:4px 0'>{n} · <span style='color:#5b6b7b'>{html.escape(a)}</span></li>" for n, a in items)
@@ -306,8 +319,9 @@ class Forecast:
 
 
 def alert_message(mailer: Mailer, mc: dict, fc: Forecast, sub: dict, new: dict, tmpdir: Path,
-                  test: bool = False) -> EmailMessage:
-    """new : {algo: [indices d'échéances avec AR]} pour les AR nouvellement prévus."""
+                  test: bool = False, hours: int | None = None) -> EmailMessage:
+    """new : {algo: [indices d'échéances avec AR]} pour les AR nouvellement prévus.
+    hours : si donné, e-mail de rappel (arrivée dans environ « hours » heures)."""
     lang = sub["lang"] if sub["lang"] in TXT else "fr"
     T = TXT[lang]
     place = place_name(sub)
@@ -337,8 +351,10 @@ def alert_message(mailer: Mailer, mc: dict, fc: Forecast, sub: dict, new: dict, 
                        f"background:{ALGOS[a]['color']};border:1px solid #0f1e2e;margin-right:6px'></span>{ALGOS[a]['label']}</td>"
                        f"<td style='{td}'><b>{s}</b></td><td style='{td}'>{e}</td></tr>" for a, s, e in rows)
              + "</table>")
-    intro = T["alert_intro"].format(run=fmt(fc.run, lang), radius=mc["radius_km"], place=html.escape(place),
-                                    coords=coords(sub))
+    reminder = hours is not None
+    intro = T["remind_intro" if reminder else "alert_intro"].format(
+        run=fmt(fc.run, lang), radius=mc["radius_km"], place=html.escape(place), coords=coords(sub), hours=hours)
+    title = T["remind_title" if reminder else "alert_title"].format(place=place)
     inner = (f"<p>{intro}</p>{table}"
              f"<p style='color:#5b6b7b;font-size:13px'>{T['end_note'].format(last=fmt(fc.valid[-1], lang))}</p>"
              f"<p style='margin:18px 0 6px'><img src='cid:{cid[1:-1]}' width='{int(mc.get('gif_width', 480))}' "
@@ -347,22 +363,35 @@ def alert_message(mailer: Mailer, mc: dict, fc: Forecast, sub: dict, new: dict, 
              f"<p><a href='{html.escape(link)}' style='{CSS_BTN}'>{T['button']}</a></p>")
     footer = f"{html.escape(T['footer'])} <a href='{html.escape(unsub)}' style='color:#2a6f97'>{T['unsubscribe']}</a>"
 
-    subject = T["alert_subject"].format(place=place, start=start_txt)
+    subject = T["remind_subject" if reminder else "alert_subject"].format(place=place, start=start_txt)
     msg = mailer.new(lang, sub["email"], ("[TEST] " if test else "") + subject, unsub)
-    text = [T["alert_title"].format(place=place), "",
+    text = [title, "",
             html.unescape(intro.replace("<b>", "").replace("</b>", "")), ""]
     text += [f"- {ALGOS[a]['label']} : {s} → {e}" for a, s, e in rows]
     text += ["", T["end_note"].format(last=fmt(fc.valid[-1], lang)), "", f"{T['button']} : {link}", "",
              T["footer"], f"{T['unsubscribe']} : {unsub}"]
     msg.set_content("\n".join(text) + "\n")
-    msg.add_alternative(wrap_html(T["alert_title"].format(place=place), inner, footer), subtype="html")
-    msg.get_payload()[1].add_related(gif.read_bytes(), "image", "gif", cid=cid, filename=f"ar_{lead}.gif")
+    msg.add_alternative(wrap_html(title, inner, footer), subtype="html")
+    msg.get_payload()[1].add_related(gif.read_bytes(), "image", "gif", cid=cid, disposition="inline",
+                                    filename=f"ar_{lead}.gif")
     return msg
 
 
-def new_events(fc: Forecast, mc: dict, sub: dict) -> tuple[dict, dict]:
-    """AR nouvellement prévus pour cet abonné et nouvel état de déduplication."""
-    state = dict(sub.get("alert_state") or {})
+def utcnow() -> dt.datetime:
+    return dt.datetime.now(dt.timezone.utc).replace(tzinfo=None)
+
+
+def zfmt(t: dt.datetime) -> str:
+    return t.strftime("%Y-%m-%dT%H:%MZ")
+
+
+def new_events(fc: Forecast, mc: dict, sub: dict, now: dt.datetime) -> tuple[dict, dict]:
+    """AR nouvellement prévus pour cet abonné et nouvel état de déduplication.
+
+    État par algorithme : until (dernière échéance avec AR connue), start (arrivée prévue de l'AR en
+    cours) et reminded (rappel déjà envoyé, ou inutile car l'alerte est partie moins de 24 h avant)."""
+    state = {a: dict(v) for a, v in (sub.get("alert_state") or {}).items()}
+    window = dt.timedelta(hours=float(mc.get("remind_h", 24)))
     gap = dt.timedelta(hours=float(mc.get("new_event_gap_h", 24)))
     new = {}
     for a in sub["algorithms"]:
@@ -376,12 +405,40 @@ def new_events(fc: Forecast, mc: dict, sub: dict) -> tuple[dict, dict]:
         first, last = fc.valid[idx[0]], fc.valid[idx[-1]]
         prev = state.get(a, {}).get("until")
         if prev and first <= parse_z(prev) + gap:
-            # même AR que celui déjà signalé : on prolonge seulement la fenêtre connue
-            state[a] = {"until": max(parse_z(prev), last).strftime("%Y-%m-%dT%H:%MZ")}
+            # même AR que celui déjà signalé : on prolonge la fenêtre et on suit l'heure d'arrivée
+            s = state[a]
+            s["until"] = zfmt(max(parse_z(prev), last))
+            if "start" in s and first > now:
+                s["start"] = zfmt(first)
             continue
         new[a] = idx
-        state[a] = {"until": last.strftime("%Y-%m-%dT%H:%MZ")}
+        state[a] = {"until": zfmt(last), "start": zfmt(first), "reminded": first - now <= window}
     return new, state
+
+
+def due_reminders(fc: Forecast, mc: dict, sub: dict, state: dict, now: dt.datetime) -> tuple[dict, int]:
+    """AR dont l'arrivée est dans moins de 24 h et pour lesquels le rappel n'est pas encore parti.
+    Marque ces AR comme rappelés dans « state » (l'appelant n'enregistre l'état qu'après l'envoi)."""
+    if not sub.get("remind_24h"):
+        return {}, 0
+    window = dt.timedelta(hours=float(mc.get("remind_h", 24)))
+    due, start = {}, None
+    for a, s in state.items():
+        if a not in fc.algos or a not in sub["algorithms"] or s.get("reminded", True) or "start" not in s:
+            continue
+        t = parse_z(s["start"])
+        if t - now > window:
+            continue
+        s["reminded"] = True
+        if t <= now:
+            continue                        # arrivée déjà passée (prévision avancée) : plus de rappel
+        idx = [i for i in fc.hits(a, float(sub["lat"]), float(sub["lon"]), float(mc["radius_km"]))
+               if fc.valid[i] >= t]
+        if idx:
+            due[a] = idx
+            start = t if start is None else min(start, t)
+    hours = int(round((start - now).total_seconds() / 3600)) if due else 0
+    return due, hours
 
 
 def cmd_alerts(cfg: dict, args) -> None:
@@ -389,6 +446,7 @@ def cmd_alerts(cfg: dict, args) -> None:
 
     mc = cfg["alert_mail"]
     fc = Forecast(cfg)
+    now = utcnow()
     print(f"Run {fc.run:%Y-%m-%d %HZ}, algorithmes : {', '.join(fc.algos)}")
     db = Supabase(mc["supabase_url"], os.environ.get("SUPABASE_SECRET_KEY", ""))
     subs = db.select("select=*&confirmed_at=not.is.null&unsubscribed_at=is.null")
@@ -398,7 +456,7 @@ def cmd_alerts(cfg: dict, args) -> None:
     try:
         with tempfile.TemporaryDirectory() as tmp:
             for sub in subs:
-                new, state = new_events(fc, mc, sub)
+                new, state = new_events(fc, mc, sub, now)
                 if new:
                     print(f"  → AR prévu à {place_name(sub)} : {', '.join(new)}")
                     try:
@@ -407,11 +465,21 @@ def cmd_alerts(cfg: dict, args) -> None:
                     except smtplib.SMTPException as e:
                         print(f"    échec de l'envoi : {e}")
                         continue                    # état inchangé : nouvel essai au prochain passage
+                due, hours = due_reminders(fc, mc, sub, state, now)
+                if due:
+                    print(f"  → rappel pour {place_name(sub)} (arrivée dans ~{hours} h) : {', '.join(due)}")
+                    try:
+                        mailer.send(alert_message(mailer, mc, fc, sub, due, Path(tmp), hours=hours))
+                        sent += 1
+                    except smtplib.SMTPException as e:
+                        print(f"    échec de l'envoi : {e}")
+                        for a in due:
+                            state[a]["reminded"] = False
                 if state != (sub.get("alert_state") or {}) and not args.dry_run:
                     db.update(sub["id"], {"alert_state": state})
     finally:
         mailer.close()
-    print(f"{sent} alerte(s) envoyée(s)")
+    print(f"{sent} e-mail(s) envoyé(s)")
 
 
 # stations du formulaire du site, pour trouver un exemple d'AR réel (commande « test »)
@@ -438,7 +506,7 @@ def cmd_test(cfg: dict, args) -> None:
     sub, new = None, {}
     for name, lat, lon in candidates:
         sub = dict(base, station=name, lat=lat, lon=lon)
-        new, _ = new_events(fc, mc, sub)
+        new, _ = new_events(fc, mc, sub, fc.run)
         if new:
             break
     if not new:
@@ -453,7 +521,7 @@ def cmd_test(cfg: dict, args) -> None:
                 i, y, x = (int(v[len(v) // 2]) for v in np.nonzero(pick))
                 lon = float(glon[x]) - 360 if glon[x] > 180 else float(glon[x])
                 sub = dict(base, station=None, lat=float(glat[y]), lon=lon)
-                new, _ = new_events(fc, mc, sub)
+                new, _ = new_events(fc, mc, sub, fc.run)
                 if new:
                     break
     if not new:
@@ -465,7 +533,11 @@ def cmd_test(cfg: dict, args) -> None:
     mailer = Mailer(mc, args.dry_run)
     try:
         with tempfile.TemporaryDirectory() as tmp:
-            mailer.send(alert_message(mailer, mc, fc, sub, new, Path(tmp), test=True))
+            hours = None
+            if args.reminder:
+                t = fc.valid[min(new[a][0] for a in new)]
+                hours = max(1, int(round((t - fc.run).total_seconds() / 3600))) if t > fc.run else 24
+            mailer.send(alert_message(mailer, mc, fc, sub, new, Path(tmp), test=True, hours=hours))
     finally:
         mailer.close()
     print("Exemple d'alerte envoyé.")
@@ -478,6 +550,7 @@ def main(argv=None):
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--to", help="test : destinataire")
     ap.add_argument("--lang", default="fr", choices=["fr", "en"])
+    ap.add_argument("--reminder", action="store_true", help="test : exemple d'e-mail de rappel")
     ap.add_argument("--station", default="Concordia")
     ap.add_argument("--lat", type=float, default=-75.10)
     ap.add_argument("--lon", type=float, default=123.35)

@@ -13,6 +13,10 @@ on:
         type: choice
         options: [fr, en]
         default: fr
+      reminder:
+        description: "Exemple d'e-mail de rappel (24 h avant l'arrivée)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -45,4 +49,5 @@ jobs:
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           TO: ${{ inputs.to }}
           LANG_MAIL: ${{ inputs.lang }}
-        run: python -u alert_mail.py test --to "$TO" --lang "$LANG_MAIL"
+          REMINDER: ${{ inputs.reminder }}
+        run: python -u alert_mail.py test --to "$TO" --lang "$LANG_MAIL" $([ "$REMINDER" = true ] && echo --reminder)

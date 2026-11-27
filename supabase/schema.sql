@@ -24,8 +24,11 @@ create table if not exists public.subscriptions (
   confirm_sent_at timestamptz,
   confirmed_at    timestamptz,
   unsubscribed_at timestamptz,
-  alert_state     jsonb not null default '{}'::jsonb
+  alert_state     jsonb not null default '{}'::jsonb,
+  remind_24h      boolean not null default false
 );
+-- projets créés avant l'option de rappel
+alter table public.subscriptions add column if not exists remind_24h boolean not null default false;
 
 -- une seule inscription active par adresse et par lieu
 create unique index if not exists subscriptions_unique_active
@@ -54,7 +57,7 @@ create trigger subscriptions_limits before insert on public.subscriptions
 -- droits : le public n'insère que ces colonnes, sans rien pouvoir relire
 alter table public.subscriptions enable row level security;
 revoke all on public.subscriptions from anon, authenticated;
-grant insert (email, station, lat, lon, algorithms, lang) on public.subscriptions to anon;
+grant insert (email, station, lat, lon, algorithms, lang, remind_24h) on public.subscriptions to anon;
 -- clé secrète (script d'alerte) : droits explicites, même si l'option « Grant API access to
 -- new tables automatically » est désactivée dans le projet
 grant select, insert, update, delete on public.subscriptions to service_role;
