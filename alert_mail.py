@@ -1,7 +1,7 @@
 """E-mails des abonnés aux alertes AR du site (inscriptions stockées dans Supabase).
 
   python alert_mail.py confirm               envoie l'e-mail de confirmation aux nouvelles inscriptions
-  python alert_mail.py alerts                après synoptic_maps.py : alerte les abonnés quand un AR
+  python alert_mail.py alerts                après synoptic_maps.py : alerte les abonnés quand une AR
                                              est prévu à leur lieu
   python alert_mail.py test --to ADRESSE     envoie un exemple d'alerte (sans toucher à Supabase) ;
                                              --reminder : exemple d'e-mail de rappel 24 h avant
@@ -149,10 +149,10 @@ TXT = {
                        "aucune alerte ne sera envoyée.",
         alert_subject="Rivière atmosphérique prévue à {place} dès le {start}",
         alert_title="Rivière atmosphérique prévue à {place}",
-        alert_intro="La prévision ECMWF HRES du run du {run} prévoit un AR à moins de {radius} km de "
+        alert_intro="La prévision ECMWF HRES du run du {run} prévoit une AR à moins de {radius} km de "
                     "<b>{place}</b> ({coords}).",
         col_algo="Algorithme", col_start="Arrivée", col_end="Dernière échéance avec AR",
-        already="déjà présent",
+        already="déjà présente",
         end_note="Fenêtre de prévision : jusqu'au {last}. Les prévisions au-delà de 3 à 4 jours sont incertaines.",
         anim="Animation : IVT, pression au niveau de la mer et contour AR ({algo}).",
         button="Voir la prévision sur le site",
@@ -160,9 +160,9 @@ TXT = {
                "de terrain. Tu reçois cet e-mail car tu t'es inscrit aux alertes AR pour ce lieu.",
         unsubscribe="Se désinscrire",
         remind_tag="rappel 24 h avant l'arrivée",
-        remind_subject="Rappel : AR attendu à {place} vers le {start}",
-        remind_title="Rappel : AR attendu à {place}",
-        remind_intro="Rappel : d'après la prévision ECMWF HRES du run du {run}, l'AR annoncé doit arriver à "
+        remind_subject="Rappel : AR attendue à {place} vers le {start}",
+        remind_title="Rappel : AR attendue à {place}",
+        remind_intro="Rappel : d'après la prévision ECMWF HRES du run du {run}, l'AR annoncée doit arriver à "
                      "moins de {radius} km de <b>{place}</b> ({coords}) dans environ {hours} h.",
     ),
     "en": dict(
@@ -458,7 +458,7 @@ def cmd_alerts(cfg: dict, args) -> None:
             for sub in subs:
                 new, state = new_events(fc, mc, sub, now)
                 if new:
-                    print(f"  → AR prévu à {place_name(sub)} : {', '.join(new)}")
+                    print(f"  → AR prévue à {place_name(sub)} : {', '.join(new)}")
                     try:
                         mailer.send(alert_message(mailer, mc, fc, sub, new, Path(tmp)))
                         sent += 1
@@ -494,8 +494,8 @@ TEST_STATIONS = [
 
 
 def cmd_test(cfg: dict, args) -> None:
-    """Exemple d'alerte « [TEST] » : le lieu demandé si un AR y est prévu, sinon la première station
-    du site où la prévision en cours montre un AR, sinon un point d'un AR prévu."""
+    """Exemple d'alerte « [TEST] » : le lieu demandé si une AR y est prévue, sinon la première station
+    du site où la prévision en cours montre une AR, sinon un point d'une AR prévue."""
     import tempfile
 
     mc = cfg["alert_mail"]

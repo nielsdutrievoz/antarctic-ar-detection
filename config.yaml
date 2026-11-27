@@ -50,7 +50,7 @@ forecast:
 
 # --- Alerte -------------------------------------------------------------------
 alert:
-  probability_threshold: 0.20   # alerte si >= 20 % des membres voient un AR au site
+  probability_threshold: 0.20   # alerte si >= 20 % des membres voient une AR au site
   min_consecutive_steps: 1      # nombre minimal de pas consécutifs au-dessus du seuil
   # Après une première alerte, renvoyer un email seulement si la probabilité max
   # augmente d'au moins cette valeur (évite un email à chaque run).
@@ -81,8 +81,8 @@ alert_mail:
   sender_name:
     fr: Alertes AR Antarctique
     en: Antarctic AR alerts
-  radius_km: 100          # AR signalé à moins de cette distance du lieu
-  new_event_gap_h: 24     # un AR prévu plus de 24 h après le dernier signalé = nouvel AR
+  radius_km: 100          # AR signalée à moins de cette distance du lieu
+  new_event_gap_h: 24     # une AR prévue plus de 24 h après la dernière signalée = nouvelle AR
   remind_h: 24            # rappel optionnel : envoyé quand l'arrivée est à moins de 24 h
   gif_width: 480
   gif_margin_h: 24        # animation : de l'arrivée − 24 h à la fin + 24 h
@@ -108,7 +108,7 @@ events:
       fr: "Décembre 2018"
       en: "December 2018"
     description:
-      fr: "Rivière atmosphérique d'origine atlantique, arrivée sur la Terre de Coats (ouest de la Terre de la Reine-Maud) le 17 décembre, puis traversée du plateau jusqu'à Concordia du 19 au 23 décembre. Le 21 décembre, la température à Concordia a atteint −14,7 °C, la deuxième plus élevée depuis 2005. Les trois algorithmes détectent l'AR à son arrivée sur la Terre de Coats, près de Neumayer III (17–19 décembre). Sur le plateau, seul DARK le suit jusqu'à Concordia (20–23 décembre) : la vapeur d'eau y est pourtant anormale (IWV deux fois supérieur au seuil le 21 décembre), mais la zone ne couvre qu'environ 12° de latitude, sous le critère de 20° des méthodes de Wille, et le transport y est orienté vers le nord, ce que vIVT ignore."
+      fr: "Rivière atmosphérique d'origine atlantique, arrivée sur la Terre de Coats (ouest de la Terre de la Reine-Maud) le 17 décembre, puis traversée du plateau jusqu'à Concordia du 19 au 23 décembre. Le 21 décembre, la température à Concordia a atteint −14,7 °C, la deuxième plus élevée depuis 2005. Les trois algorithmes détectent l'AR à son arrivée sur la Terre de Coats, près de Neumayer III (17–19 décembre). Sur le plateau, seul DARK la suit jusqu'à Concordia (20–23 décembre) : la vapeur d'eau y est pourtant anormale (IWV deux fois supérieur au seuil le 21 décembre), mais la zone ne couvre qu'environ 12° de latitude, sous le critère de 20° des méthodes de Wille, et le transport y est orienté vers le nord, ce que vIVT ignore."
       en: "Atlantic-sourced atmospheric river that made landfall over Coats Land (western Dronning Maud Land) on 17 December, then crossed the plateau to Concordia from 19 to 23 December. On 21 December the temperature at Concordia reached −14.7 °C, the second highest since 2005. All three algorithms detect the AR at landfall over Coats Land, near Neumayer III (17–19 December). Over the plateau only DARK tracks it to Concordia (20–23 December): water vapour there is clearly anomalous (IWV twice the threshold on 21 December), but the moist area spans only about 12° of latitude, below the 20° criterion of the Wille methods, and the transport points northward, which vIVT ignores."
     reference:
       text: "Dutrievoz et al. (2026), The Cryosphere 20, 1025–1046"

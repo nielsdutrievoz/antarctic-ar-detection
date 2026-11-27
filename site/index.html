@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&display=swap">
-  <link rel="stylesheet" href="style.css?v=20261127a">
+  <link rel="stylesheet" href="style.css?v=20261127b">
 </head>
 <body>
   <header class="topbar">
@@ -110,7 +110,7 @@
       <p>Les points candidats entre 37,5°S et 85°S sont regroupés en objets contigus. Un objet n'est retenu comme AR que s'il s'étend sur <b>au moins 20° de latitude</b> : ce critère sélectionne les structures longues et orientées vers le pôle, typiques des AR, et écarte les maxima isolés.</p>
 
       <h3>4. AR aux stations</h3>
-      <p>Un AR est signalé à une station quand au moins un point de l'objet AR se trouve à moins de 100 km de celle-ci.</p>
+      <p>Une AR est signalée à une station quand au moins un point de l'objet AR se trouve à moins de 100 km de celle-ci.</p>
 
       <h3>Données</h3>
       <ul>
@@ -122,7 +122,7 @@
       <ul>
         <li>Les seuils viennent d'ERA5 (colonne complète) alors que les prévisions sont intégrées sur 8 niveaux : le vIVT prévu est légèrement sous-estimé, ce qui rend la détection un peu conservatrice.</li>
         <li>Le regroupement en objets est une réimplémentation (composantes connexes) du découpage du code original ; les contours peuvent légèrement différer de ceux des catalogues de Wille.</li>
-        <li>Pour les méthodes de Wille, la détection s'arrête à 85°S, et le critère de 20° de latitude favorise les AR qui s'étendent depuis l'océan : un AR très avancé sur le plateau peut être manqué (DARK lève cette limite).</li>
+        <li>Pour les méthodes de Wille, la détection s'arrête à 85°S, et le critère de 20° de latitude favorise les AR qui s'étendent depuis l'océan : une AR très avancée sur le plateau peut être manquée (DARK lève cette limite).</li>
         <li>Les prévisions au-delà de 3 à 4 jours sont incertaines ; ce produit est expérimental.</li>
       </ul>
       <h3>Trois algorithmes au choix</h3>
@@ -134,11 +134,11 @@
           <tr><th>Seuil</th><td>98<sup>e</sup> percentile, par mois</td><td>98<sup>e</sup> percentile, par mois</td><td>98<sup>e</sup> percentile, fenêtre glissante de 15 jours</td></tr>
           <tr><th>Forme</th><td>≥ 20° de latitude</td><td>≥ 20° de latitude</td><td>axe central (courbe) ≥ 2000 km, surface ≥ 20 000 km²</td></tr>
           <tr><th>Domaine</th><td>37,5–85°S</td><td>37,5–85°S</td><td>15–90°S, pôle compris</td></tr>
-          <tr><th>Point fort</th><td>intrusions venant de l'océan, liées aux fortes précipitations</td><td>suit l'humidité quel que soit le sens du vent</td><td>AR courbés, qui tournent ou traversent le pôle</td></tr>
+          <tr><th>Point fort</th><td>intrusions venant de l'océan, liées aux fortes précipitations</td><td>suit l'humidité quel que soit le sens du vent</td><td>AR courbées, qui tournent ou traversent le pôle</td></tr>
           <tr><th>Référence</th><td>Wille et al. (2021)</td><td>Wille et al. (2019)</td><td>Buffet et al. (2026)</td></tr>
         </tbody>
       </table></div>
-      <p><b>DARK</b> (<i>Detecting ARs using their Kurvature</i>) part du même principe d'intensité que Wille, mais supprime les contraintes de direction. Les points où l'IVT dépasse son 98<sup>e</sup> percentile sont regroupés en objets ; pour chaque objet, on extrait son squelette, puis l'axe central le plus long, qu'on lisse. L'objet est un AR si cet axe mesure au moins 2000 km le long de sa courbure (l'équivalent des 20° de latitude de Wille). Un AR qui tourne vers l'ouest le long de la côte, ou qui traverse le pôle et revient vers le nord, reste ainsi détecté. C'est le cas de l'AR de décembre 2018 à Concordia, où le transport était dirigé vers l'océan et que Wille vIVT ne voit pas.</p>
+      <p><b>DARK</b> (<i>Detecting ARs using their Kurvature</i>) part du même principe d'intensité que Wille, mais supprime les contraintes de direction. Les points où l'IVT dépasse son 98<sup>e</sup> percentile sont regroupés en objets ; pour chaque objet, on extrait son squelette, puis l'axe central le plus long, qu'on lisse. L'objet est une AR si cet axe mesure au moins 2000 km le long de sa courbure (l'équivalent des 20° de latitude de Wille). Une AR qui tourne vers l'ouest le long de la côte, ou qui traverse le pôle et revient vers le nord, reste ainsi détectée. C'est le cas de l'AR de décembre 2018 à Concordia, où le transport était dirigé vers l'océan et que Wille vIVT ne voit pas.</p>
       <p class="small muted">Adaptation sur ce site : seuils calculés par pentade (fenêtre de 15 jours centrée sur chaque période de 5 jours) plutôt que pour chaque jour ; surface minimale de 20 000 km² comme dans le code publié (v1.0) ; le module « AR-children », qui suit les restes d'AR après l'atterrissage, n'est pas inclus.</p>
 
       <h3>Catalogue et code</h3>
@@ -226,7 +226,7 @@
   <main class="wrap alert-layout" id="alert-page" hidden>
     <section class="panel">
       <p class="eyebrow" data-i18n="alert_eyebrow">Alerte par e-mail</p>
-      <h2 data-i18n="alert_title">Être prévenu quand un AR approche</h2>
+      <h2 data-i18n="alert_title">Être prévenu quand une AR approche</h2>
       <p class="muted-p" data-i18n="alert_intro"></p>
       <p class="notice" id="alert-link-msg" role="status" hidden></p>
 
@@ -324,6 +324,6 @@
     <p data-i18n-html="footer"></p>
   </footer>
 
-  <script src="app.js?v=20261127a"></script>
+  <script src="app.js?v=20261127b"></script>
 </body>
 </html>
