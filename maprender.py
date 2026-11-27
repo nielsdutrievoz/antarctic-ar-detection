@@ -195,20 +195,37 @@ def make_gif(frames: list[tuple[str, str | None]], out: str, width: int = 640, m
     """
     from PIL import Image
 
-    rgb = []
+    import numpy as np
+
+    rgb, over = [], []
     for base, layer in frames:
         im = Image.open(base).convert("RGBA")
+        lay = None
         if layer:
-            im = Image.alpha_composite(im, Image.open(layer).convert("RGBA"))
+            lay = Image.open(layer).convert("RGBA")
+            im = Image.alpha_composite(im, lay)
         im = im.convert("RGB")
         h = round(im.height * width / im.width)
-        rgb.append(im.resize((width, h), Image.LANCZOS))
+        im = im.resize((width, h), Image.LANCZOS)
+        rgb.append(im)
+        if lay is not None:
+            # couleurs du calque (contour AR) : trop peu de pixels pour survivre à la palette commune
+            a = np.asarray(lay.resize((width, h), Image.LANCZOS))[..., 3] > 128
+            over.append(np.asarray(im)[a])
     pick = sorted({round(i * (len(rgb) - 1) / 5) for i in range(6)})
     W, H = rgb[0].size
     mosaic = Image.new("RGB", (W * len(pick), H))
     for k, i in enumerate(pick):
         mosaic.paste(rgb[i], (k * W, 0))
-    pal = mosaic.quantize(colors=colors, method=Image.Quantize.MEDIANCUT)
+    n_over = 16 if over and sum(len(o) for o in over) else 0
+    pal = mosaic.quantize(colors=colors - n_over, method=Image.Quantize.MEDIANCUT)
+    if n_over:
+        px = np.concatenate(over)[None, :, :].astype(np.uint8)
+        extra = Image.fromarray(px).quantize(colors=n_over, method=Image.Quantize.MEDIANCUT)
+        p1 = pal.getpalette()[: 3 * (colors - n_over)]
+        p2 = extra.getpalette()[: 3 * n_over]
+        pal = Image.new("P", (1, 1))
+        pal.putpalette(p1 + p2)
     imgs = [im.quantize(palette=pal, dither=Image.Dither.NONE) for im in rgb]
     durations = [ms] * len(imgs)
     durations[-1] = ms * 4                     # pause sur la dernière image

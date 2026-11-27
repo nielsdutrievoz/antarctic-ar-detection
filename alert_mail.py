@@ -159,6 +159,13 @@ TXT = {
         footer="Produit expérimental de recherche, sans garantie : ne pas utiliser pour la sécurité des opérations "
                "de terrain. Tu reçois cet e-mail car tu t'es inscrit aux alertes AR pour ce lieu.",
         unsubscribe="Se désinscrire",
+        eyebrow_alert="Alerte AR · prévision ECMWF",
+        eyebrow_remind="Rappel AR · prévision ECMWF",
+        eyebrow_confirm="Alertes AR · inscription",
+        lead_arrival="Arrivée prévue : {start}",
+        site_name="Rivières atmosphériques en Antarctique",
+        sec_detail="Détail par algorithme",
+        sec_anim="Animation",
         remind_tag="rappel 24 h avant l'arrivée",
         remind_subject="Rappel : AR attendue à {place} vers le {start}",
         remind_title="Rappel : AR attendue à {place}",
@@ -185,6 +192,13 @@ TXT = {
         footer="Experimental research product, no warranty: do not use for field-operation safety. "
                "You receive this email because you subscribed to AR alerts for this location.",
         unsubscribe="Unsubscribe",
+        eyebrow_alert="AR alert · ECMWF forecast",
+        eyebrow_remind="AR reminder · ECMWF forecast",
+        eyebrow_confirm="AR alerts · subscription",
+        lead_arrival="Expected arrival: {start}",
+        site_name="Atmospheric rivers in Antarctica",
+        sec_detail="Details by algorithm",
+        sec_anim="Animation",
         remind_tag="reminder 24 h before arrival",
         remind_subject="Reminder: AR expected at {place} around {start}",
         remind_title="Reminder: AR expected at {place}",
@@ -193,19 +207,40 @@ TXT = {
     ),
 }
 
-CSS_BTN = ("display:inline-block;background:#2a6f97;color:#ffffff;text-decoration:none;padding:11px 20px;"
-           "border-radius:8px;font-weight:600")
+# mêmes couleurs et polices que le site (les polices web ne s'affichent que dans certains clients ;
+# sinon Helvetica / Arial). Aucune image en plus du GIF : la taille de l'e-mail ne change pas.
+INK, MUTED, LINE, ACCENT, HERO = "#0f1e2e", "#5b6b7b", "#dde5ec", "#2a6f97", "#13293d"
+F_HEAD = "'Sora',Helvetica,Arial,sans-serif"
+F_BODY = "'Source Sans 3',Helvetica,Arial,sans-serif"
+CSS_BTN = (f"display:inline-block;background:{ACCENT};color:#ffffff;text-decoration:none;padding:11px 20px;"
+           f"border-radius:8px;font-weight:600;font-family:{F_BODY};font-size:15px")
+CSS_EYEBROW = (f"font-family:{F_HEAD};font-size:11px;letter-spacing:.12em;text-transform:uppercase;"
+               f"color:{MUTED};margin:22px 0 8px")
 
 
-def wrap_html(title: str, inner: str, footer: str) -> str:
-    return f"""<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;background:#f4f7f9;font-family:Helvetica,Arial,sans-serif;color:#0f1e2e">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:24px 12px">
-<table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#ffffff;border:1px solid #dde5ec;border-radius:14px">
-<tr><td style="padding:22px 26px 6px"><div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#5b6b7b">Antarctic AR</div>
-<h1 style="font-size:21px;font-weight:600;margin:6px 0 0">{html.escape(title)}</h1></td></tr>
-<tr><td style="padding:10px 26px 22px;font-size:15px;line-height:1.5">{inner}</td></tr>
+def section(label: str) -> str:
+    return f"<p style=\"{CSS_EYEBROW}\">{html.escape(label)}</p>"
+
+
+def wrap_html(title: str, inner: str, footer: str, eyebrow: str, lead: str, site: tuple[str, str]) -> str:
+    """site : (url, nom) du site, rappelés en haut et en bas."""
+    url, name = html.escape(site[0]), html.escape(site[1])
+    return f"""<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;600&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet"></head>
+<body style="margin:0;background:#f4f7f9;font-family:{F_BODY};color:{INK}">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f7f9"><tr><td align="center" style="padding:24px 12px">
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border:1px solid {LINE};border-radius:14px;border-collapse:separate;overflow:hidden">
+<tr><td bgcolor="{HERO}" style="background:{HERO};background-image:linear-gradient(180deg,#1b3a55 0%,{HERO} 100%);padding:18px 28px 26px;color:#ffffff;border-radius:13px 13px 0 0">
+<a href="{url}" style="font-family:{F_HEAD};font-weight:600;font-size:14px;color:#ffffff;text-decoration:none">Niels Dutrievoz</a>
+<p style="font-family:{F_HEAD};font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#c9d6e2;margin:22px 0 8px">{html.escape(eyebrow)}</p>
+<h1 style="font-family:{F_HEAD};font-weight:300;font-size:26px;line-height:1.2;letter-spacing:-.02em;margin:0;color:#ffffff">{html.escape(title)}</h1>
+{f'<p style="font-size:16px;line-height:1.5;margin:10px 0 0;color:#e6edf3">{lead}</p>' if lead else ''}
+</td></tr>
+<tr><td style="padding:22px 28px 26px;font-size:16px;line-height:1.55">{inner}</td></tr>
 </table>
-<p style="max-width:560px;font-size:12px;line-height:1.5;color:#5b6b7b;margin:14px auto 0">{footer}</p>
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%"><tr><td style="padding:16px 8px 0;font-size:12px;line-height:1.5;color:{MUTED}">
+<a href="{url}" style="font-family:{F_HEAD};color:{INK};text-decoration:none;font-weight:600">{name}</a><br>{footer}
+</td></tr></table>
 </td></tr></table></body></html>"""
 
 
@@ -242,8 +277,9 @@ def confirmation_message(mailer: Mailer, mc: dict, subs: list[dict]) -> EmailMes
     text = (f"{T['confirm_title']}\n\n{body}\n" + "\n".join(plain)
             + f"\n\n{T['confirm_button']} : {confirm}\n\n{T['confirm_ignore']}\n")
     msg.set_content(text)
-    footer = f"<a href='{html.escape(mc['site_url'])}' style='color:#2a6f97'>{html.escape(mc['site_url'])}</a>"
-    msg.add_alternative(wrap_html(T["confirm_title"], inner, footer), subtype="html")
+    footer = f"<a href='{html.escape(mc['site_url'])}' style='color:{ACCENT}'>{html.escape(mc['site_url'])}</a>"
+    msg.add_alternative(wrap_html(T["confirm_title"], inner, footer, T["eyebrow_confirm"], "",
+                                  (site_link(mc, lang=lang), T["site_name"])), subtype="html")
     return msg
 
 
@@ -310,11 +346,11 @@ class Forecast:
             return []
         return [i for i in range(len(self.valid)) if self.masks[algo][i][near].any()]
 
-    def gif(self, algo: str, lang: str, i0: int, i1: int, width: int, out: Path) -> Path:
+    def gif(self, algo: str, lang: str, i0: int, i1: int, width: int, out: Path, colors: int = 128) -> Path:
         import maprender
 
         frames = [(str(self.maps / lang / f), str(self.maps / lang / algo / f)) for f in self.files[i0:i1 + 1]]
-        maprender.make_gif(frames, str(out), width=width)
+        maprender.make_gif(frames, str(out), width=width, colors=colors)
         return out
 
 
@@ -338,14 +374,15 @@ def alert_message(mailer: Mailer, mc: dict, fc: Forecast, sub: dict, new: dict, 
     step_h = (fc.valid[1] - fc.valid[0]).total_seconds() / 3600 if len(fc.valid) > 1 else 6
     m = int(round(mc.get("gif_margin_h", 24) / step_h))
     g0, g1 = max(0, new[lead][0] - m), min(len(fc.valid) - 1, new[lead][-1] + m)
-    gif = fc.gif(lead, lang, g0, g1, int(mc.get("gif_width", 480)), tmpdir / f"{sub['id']}.gif")
+    gif = fc.gif(lead, lang, g0, g1, int(mc.get("gif_width", 520)), tmpdir / f"{sub['id']}.gif",
+                 colors=int(mc.get("gif_colors", 160)))
 
     link = site_link(mc, lang=lang, algo=lead) + "#forecast"
     unsub = site_link(mc, lang=lang, unsubscribe=sub["token"])
     cid = make_msgid(domain=mc["sender"].split("@")[1])
-    th = "text-align:left;padding:7px 8px;border-bottom:1px solid #dde5ec;font-size:13px;color:#5b6b7b"
-    td = "padding:7px 8px;border-bottom:1px solid #eef2f5;font-size:14px"
-    table = (f"<table role='presentation' cellpadding='0' cellspacing='0' style='border-collapse:collapse;width:100%;margin:14px 0'>"
+    th = f"text-align:left;padding:7px 8px;border-bottom:1px solid {LINE};font-size:13px;font-weight:600;color:{MUTED}"
+    td = "padding:8px 8px;border-bottom:1px solid #eef2f5;font-size:15px"
+    table = (f"<table role='presentation' cellpadding='0' cellspacing='0' style='border-collapse:collapse;width:100%;margin:0'>"
              f"<tr><th style='{th}'>{T['col_algo']}</th><th style='{th}'>{T['col_start']}</th><th style='{th}'>{T['col_end']}</th></tr>"
              + "".join(f"<tr><td style='{td}'><span style='display:inline-block;width:10px;height:10px;border-radius:50%;"
                        f"background:{ALGOS[a]['color']};border:1px solid #0f1e2e;margin-right:6px'></span>{ALGOS[a]['label']}</td>"
@@ -355,13 +392,16 @@ def alert_message(mailer: Mailer, mc: dict, fc: Forecast, sub: dict, new: dict, 
     intro = T["remind_intro" if reminder else "alert_intro"].format(
         run=fmt(fc.run, lang), radius=mc["radius_km"], place=html.escape(place), coords=coords(sub), hours=hours)
     title = T["remind_title" if reminder else "alert_title"].format(place=place)
-    inner = (f"<p>{intro}</p>{table}"
-             f"<p style='color:#5b6b7b;font-size:13px'>{T['end_note'].format(last=fmt(fc.valid[-1], lang))}</p>"
-             f"<p style='margin:18px 0 6px'><img src='cid:{cid[1:-1]}' width='{int(mc.get('gif_width', 480))}' "
-             f"alt='' style='max-width:100%;height:auto;border-radius:8px;display:block'></p>"
-             f"<p style='color:#5b6b7b;font-size:13px;margin:4px 0 20px'>{T['anim'].format(algo=ALGOS[lead]['label'])}</p>"
-             f"<p><a href='{html.escape(link)}' style='{CSS_BTN}'>{T['button']}</a></p>")
-    footer = f"{html.escape(T['footer'])} <a href='{html.escape(unsub)}' style='color:#2a6f97'>{T['unsubscribe']}</a>"
+    gw = int(mc.get("gif_width", 520))
+    inner = (f"<p style='margin:0'>{intro}</p>"
+             f"{section(T['sec_detail'])}{table}"
+             f"<p style='color:{MUTED};font-size:13px;margin:8px 0 0'>{T['end_note'].format(last=fmt(fc.valid[-1], lang))}</p>"
+             f"{section(T['sec_anim'])}"
+             f"<img src='cid:{cid[1:-1]}' width='{gw}' alt='' style='width:100%;max-width:{gw}px;height:auto;"
+             f"border:1px solid {LINE};border-radius:10px;display:block;margin:0 auto'>"
+             f"<p style='color:{MUTED};font-size:13px;margin:6px 0 22px'>{T['anim'].format(algo=ALGOS[lead]['label'])}</p>"
+             f"<p style='margin:0'><a href='{html.escape(link)}' style='{CSS_BTN}'>{T['button']}</a></p>")
+    footer = f"{html.escape(T['footer'])} <a href='{html.escape(unsub)}' style='color:{ACCENT}'>{T['unsubscribe']}</a>"
 
     subject = T["remind_subject" if reminder else "alert_subject"].format(place=place, start=start_txt)
     msg = mailer.new(lang, sub["email"], ("[TEST] " if test else "") + subject, unsub)
@@ -371,7 +411,10 @@ def alert_message(mailer: Mailer, mc: dict, fc: Forecast, sub: dict, new: dict, 
     text += ["", T["end_note"].format(last=fmt(fc.valid[-1], lang)), "", f"{T['button']} : {link}", "",
              T["footer"], f"{T['unsubscribe']} : {unsub}"]
     msg.set_content("\n".join(text) + "\n")
-    msg.add_alternative(wrap_html(title, inner, footer), subtype="html")
+    lead_html = html.escape(T["lead_arrival"].format(start=start_txt))
+    msg.add_alternative(wrap_html(title, inner, footer, T["eyebrow_remind" if reminder else "eyebrow_alert"],
+                                  f"<b>{html.escape(place)}</b> · {lead_html}", (site_link(mc, lang=lang), T["site_name"])),
+                        subtype="html")
     msg.get_payload()[1].add_related(gif.read_bytes(), "image", "gif", cid=cid, disposition="inline",
                                     filename=f"ar_{lead}.gif")
     return msg
